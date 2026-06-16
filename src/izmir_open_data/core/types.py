@@ -1,6 +1,6 @@
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
-from pydantic import AliasChoices, BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field, field_validator
 
 T = TypeVar("T")
 
@@ -32,4 +32,11 @@ class OnemliYerWrapper(BaseModel, Generic[T]):
         )
     )
     toplam_sayfa_sayisi: int = Field(alias="toplam_sayfa_sayisi")
-    kayitlar: list[T] = Field(validation_alias=AliasChoices("kayitlar", "onemliyer"))
+    kayitlar: list[T] = Field(
+        default_factory=list, validation_alias=AliasChoices("kayitlar", "onemliyer")
+    )
+
+    @field_validator("kayitlar", mode="before")
+    @classmethod
+    def set_empty_list_if_none(cls, v: Any) -> Any:
+        return [] if v is None else v

@@ -103,6 +103,10 @@ class IzmirClient:
                 f"API response error: {response.status_code}", response.status_code
             )
 
+        # Eğer 204 No Content dönerse, JSON parse etmeye çalışmadan None döndür.
+        if response.status_code == 204:
+            return None
+
         data = response.json()
         if response_model:
             from pydantic import TypeAdapter
