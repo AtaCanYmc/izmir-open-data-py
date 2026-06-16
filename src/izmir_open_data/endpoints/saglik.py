@@ -22,25 +22,32 @@ class SaglikEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/ailesagligimerkezleri
         """
         return await self._client.get(
-            "ibb/cbs/ailesagligimerkezleri", response_model=OnemliYerWrapper[SaglikKurumu]
+            "ibb/cbs/ailesagligimerkezleri",
+            response_model=OnemliYerWrapper[SaglikKurumu],
         )
 
-    async def get_agiz_dis_sagligi_merkezleri_list(self) -> OnemliYerWrapper[SaglikKurumu]:
+    async def get_agiz_dis_sagligi_merkezleri_list(
+        self,
+    ) -> OnemliYerWrapper[SaglikKurumu]:
         """
         Ağız ve diş sağlığı merkezleri konum bilgilerini içeren web servisi.
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/agizvedissagligimerkezleri
         """
         return await self._client.get(
-            "ibb/cbs/agizvedissagligimerkezleri", response_model=OnemliYerWrapper[SaglikKurumu]
+            "ibb/cbs/agizvedissagligimerkezleri",
+            response_model=OnemliYerWrapper[SaglikKurumu],
         )
 
-    async def get_ana_cocuk_sagligi_merkezleri_list(self) -> OnemliYerWrapper[SaglikKurumu]:
+    async def get_ana_cocuk_sagligi_merkezleri_list(
+        self,
+    ) -> OnemliYerWrapper[SaglikKurumu]:
         """
         Ana çocuk sağlığı merkezleri konum bilgilerini içeren web servisi.
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/anacocuksagligimerkezleri
         """
         return await self._client.get(
-            "ibb/cbs/anacocuksagligimerkezleri", response_model=OnemliYerWrapper[SaglikKurumu]
+            "ibb/cbs/anacocuksagligimerkezleri",
+            response_model=OnemliYerWrapper[SaglikKurumu],
         )
 
     async def get_dal_merkezleri_list(self) -> OnemliYerWrapper[SaglikKurumu]:
@@ -97,22 +104,28 @@ class SaglikEndpoint(BaseEndpoint):
             "ibb/cbs/tipmerkezleri", response_model=OnemliYerWrapper[SaglikKurumu]
         )
 
-    async def get_toplum_sagligi_merkezleri_list(self) -> OnemliYerWrapper[SaglikKurumu]:
+    async def get_toplum_sagligi_merkezleri_list(
+        self,
+    ) -> OnemliYerWrapper[SaglikKurumu]:
         """
         Toplum sağlığı merkezleri konum bilgilerini içeren web servisi.
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/toplumsakligimerkezleri
         """
         return await self._client.get(
-            "ibb/cbs/toplumsagligimerkezleri", response_model=OnemliYerWrapper[SaglikKurumu]
+            "ibb/cbs/toplumsagligimerkezleri",
+            response_model=OnemliYerWrapper[SaglikKurumu],
         )
 
-    async def get_verem_savas_dispanserleri_list(self) -> OnemliYerWrapper[SaglikKurumu]:
+    async def get_verem_savas_dispanserleri_list(
+        self,
+    ) -> OnemliYerWrapper[SaglikKurumu]:
         """
         Verem savaş dispanserleri konum bilgilerini içeren web servisi.
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/veremsavasdispanserleri
         """
         return await self._client.get(
-            "ibb/cbs/veremsavasdispanserleri", response_model=OnemliYerWrapper[SaglikKurumu]
+            "ibb/cbs/veremsavasdispanserleri",
+            response_model=OnemliYerWrapper[SaglikKurumu],
         )
 
     async def get_veterinerlikler_list(self) -> OnemliYerWrapper[SaglikKurumu]:

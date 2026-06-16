@@ -100,7 +100,9 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hatlari.csv
         """
-        return await self._client.get_csv('https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hatlari.csv')
+        return await self._client.get_csv(
+            "https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hatlari.csv"
+        )
 
     async def get_hareket_saatleri(self) -> list[EshotHareketSaati]:
         """
@@ -109,7 +111,9 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hareketsaatleri.csv
         """
-        return await self._client.get_csv('https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hareketsaatleri.csv')
+        return await self._client.get_csv(
+            "https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hareketsaatleri.csv"
+        )
 
     async def get_duraklar(self) -> list[EshotDurakCSV]:
         """
@@ -118,7 +122,9 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-duraklari.csv
         """
-        return await self._client.get_csv('https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-duraklari.csv')
+        return await self._client.get_csv(
+            "https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-duraklari.csv"
+        )
 
     async def get_hat_guzergahlari(self) -> list[EshotHatGuzergah]:
         """
@@ -129,7 +135,8 @@ class EshotEndpoint(BaseEndpoint):
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv
         """
         return await self._client.get_csv(
-            'https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv')
+            "https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv"
+        )
 
     async def get_baglanti_tipleri(self) -> list[EshotBaglantiTipi]:
         """
@@ -139,7 +146,8 @@ class EshotEndpoint(BaseEndpoint):
         Kaynak: https://acikveri.bizizmir.com/dataset/otobus-hatlarinin-diger-ulasim-araclari-ile-baglanti-tipleri
         """
         return await self._client.get_csv(
-            'https://acikveri.bizizmir.com/dataset/f0964595-53e0-4b94-bf11-9423f8bb595e/resource/c228da75-adfd-422a-a480-2a4c7ffa7586/download/eshot-otobus-baglanti-tipleri.csv')
+            "https://acikveri.bizizmir.com/dataset/f0964595-53e0-4b94-bf11-9423f8bb595e/resource/c228da75-adfd-422a-a480-2a4c7ffa7586/download/eshot-otobus-baglanti-tipleri.csv"
+        )
 
     async def get_baglanti_hatlari(self) -> list[EshotBaglantiHat]:
         """
@@ -149,17 +157,24 @@ class EshotEndpoint(BaseEndpoint):
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv
         """
         return await self._client.get_csv(
-            'https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv')
+            "https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv"
+        )
 
-    async def get_yakin_durak_list(self, enlem: float, boylam: float) -> OnemliYerWrapper[EshotDurak]:
+    async def get_yakin_durak_list(
+        self, enlem: float, boylam: float
+    ) -> OnemliYerWrapper[EshotDurak]:
         """
         ESHOT duraklarının konum, isim ve diğer bilgilerini içeren web servisi.
 
         Kaynak: https://acikveri.bizizmir.com/dataset/eshot-duraklari
         """
-        return await self._client.get(f"ibb/cbs/noktayayakinduraklar?x={enlem}&y={boylam}")
+        return await self._client.get(
+            f"ibb/cbs/noktayayakinduraklar?x={enlem}&y={boylam}"
+        )
 
-    async def get_duraga_yaklasan_otobus_list(self, durak_id: int) -> list[YaklasanOtobus]:
+    async def get_duraga_yaklasan_otobus_list(
+        self, durak_id: int
+    ) -> list[YaklasanOtobus]:
         """
         Bir durağa yaklaşan otobüslerin listesi, konumu ve diğer bilgilerini içeren web servisi.
 
@@ -168,7 +183,9 @@ class EshotEndpoint(BaseEndpoint):
         """
         return await self._client.get(f"iztek/duragayaklasanotobusler/{durak_id}")
 
-    async def get_hattin_yaklasan_otobusleri(self, hat_id: int, durak_id: int) -> list[YaklasanOtobus]:
+    async def get_hattin_yaklasan_otobusleri(
+        self, hat_id: int, durak_id: int
+    ) -> list[YaklasanOtobus]:
         """
         Bir hattın belirli bir durağa yaklaşan otobüslerinin konum ve diğer bilgilerini içeren web servisi.
 
@@ -176,7 +193,9 @@ class EshotEndpoint(BaseEndpoint):
         :param hat_id: Hat numarası
         :param durak_id: Durak numarası
         """
-        return await self._client.get(f"iztek/hattinyaklasanotobusleri/{hat_id}/{durak_id}")
+        return await self._client.get(
+            f"iztek/hattinyaklasanotobusleri/{hat_id}/{durak_id}"
+        )
 
     async def get_hat_otobus_konumlari(self, hat_id: int) -> HatOtobusKonumlariResponse:
         """
@@ -187,7 +206,9 @@ class EshotEndpoint(BaseEndpoint):
         """
         return await self._client.get(f"iztek/hatotobuskonumlari/{hat_id}")
 
-    async def scrap_eshot_sirali_durak_listesi(self, hat_no: str, yon: Literal[0, 1]) -> list[EshotSiraliDurak]:
+    async def scrap_eshot_sirali_durak_listesi(
+        self, hat_no: str, yon: Literal[0, 1]
+    ) -> list[EshotSiraliDurak]:
         """
         ESHOT duraklarının sıralı listesini çeken web servisi.
 
@@ -205,33 +226,35 @@ class EshotEndpoint(BaseEndpoint):
                 response = await client.post(
                     url,
                     headers={
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     },
-                    data={'hatYon': str(yon)}
+                    data={"hatYon": str(yon)},
                 )
                 response.raise_for_status()
                 html = response.text
 
-                soup = BeautifulSoup(html, 'html.parser')
+                soup = BeautifulSoup(html, "html.parser")
                 stops = []
-                for block in soup.select('.block-transfer'):
-                    ul = block.select_one('ul.transfer')
+                for block in soup.select(".block-transfer"):
+                    ul = block.select_one("ul.transfer")
                     if ul:
-                        stops = [li.text.strip() for li in ul.select('li.ring')]
+                        stops = [li.text.strip() for li in ul.select("li.ring")]
                         if stops:
                             break
 
                 result = []
                 for idx, durak in enumerate(stops):
-                    parts = durak.split(' - ')
-                    result.append(EshotSiraliDurak(
-                        hatNo=hat_no,
-                        yon=yon,
-                        durakAdi=parts[0] if len(parts) > 0 else "-",
-                        durakId=parts[1] if len(parts) > 1 else "-",
-                        sira=idx + 1
-                    ))
+                    parts = durak.split(" - ")
+                    result.append(
+                        EshotSiraliDurak(
+                            hatNo=hat_no,
+                            yon=yon,
+                            durakAdi=parts[0] if len(parts) > 0 else "-",
+                            durakId=parts[1] if len(parts) > 1 else "-",
+                            sira=idx + 1,
+                        )
+                    )
                 return result
         except Exception as e:
             print(f"ESHOT durakları çekilirken hata oluştu: {e}")

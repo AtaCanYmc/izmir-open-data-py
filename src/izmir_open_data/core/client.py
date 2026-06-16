@@ -1,8 +1,8 @@
 import csv
 import io
 from typing import Any
-import httpx
 
+import httpx
 from izmir_open_data.core.exceptions import APIError
 from izmir_open_data.endpoints.afetler import AfetlerEndpoint
 from izmir_open_data.endpoints.bisim import BisimEndpoint
@@ -40,11 +40,11 @@ class IzmirClient:
     """Async client for Izmir Open Data API."""
 
     def __init__(
-            self,
-            api_key: str | None = None,
-            base_url: str = "https://openapi.izmir.bel.tr/api/",
-            ckan_base_url: str = "https://acikveri.bizizmir.com/api/3/action/",
-            ckan_dump_base_url: str = "https://acikveri.bizizmir.com/datastore/dump/",
+        self,
+        api_key: str | None = None,
+        base_url: str = "https://openapi.izmir.bel.tr/api/",
+        ckan_base_url: str = "https://acikveri.bizizmir.com/api/3/action/",
+        ckan_dump_base_url: str = "https://acikveri.bizizmir.com/datastore/dump/",
     ):
         self.api_key = api_key
         self.base_url = base_url
@@ -99,26 +99,37 @@ class IzmirClient:
         url = f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
         response = await self._client.get(url)
         if not response.is_success:
-            raise APIError(f"API response error: {response.status_code}", response.status_code)
-        
+            raise APIError(
+                f"API response error: {response.status_code}", response.status_code
+            )
+
         data = response.json()
         if response_model:
             from pydantic import TypeAdapter
+
             return TypeAdapter(response_model).validate_python(data)
         return data
 
-    async def get_ckan(self, action: str, params: dict[str, Any] | None = None, response_model: Any = None) -> Any:
+    async def get_ckan(
+        self,
+        action: str,
+        params: dict[str, Any] | None = None,
+        response_model: Any = None,
+    ) -> Any:
         """Fetch from CKAN API."""
         url = f"{self.ckan_base_url.rstrip('/')}/{action.lstrip('/')}"
         response = await self._client.get(url, params=params or {})
         if not response.is_success:
-            raise APIError(f"CKAN API response error: {response.status_code}", response.status_code)
+            raise APIError(
+                f"CKAN API response error: {response.status_code}", response.status_code
+            )
 
         data = response.json()
         if data.get("success"):
             result = data.get("result")
             if response_model:
                 from pydantic import TypeAdapter
+
                 return TypeAdapter(response_model).validate_python(result)
             return result
         else:
@@ -130,11 +141,15 @@ class IzmirClient:
         url = f"{self.ckan_dump_base_url.rstrip('/')}/{resource_id.lstrip('/')}?format=json"
         response = await self._client.get(url, timeout=30.0)
         if not response.is_success:
-            raise APIError(f"CKAN Dump API response error: {response.status_code}", response.status_code)
-            
+            raise APIError(
+                f"CKAN Dump API response error: {response.status_code}",
+                response.status_code,
+            )
+
         data = response.json()
         if response_model:
             from pydantic import TypeAdapter
+
             return TypeAdapter(response_model).validate_python(data)
         return data
 
@@ -142,7 +157,9 @@ class IzmirClient:
         """Fetch and parse CSV data."""
         response = await self._client.get(url, timeout=30.0)
         if not response.is_success:
-            raise APIError(f"CSV API response error: {response.status_code}", response.status_code)
+            raise APIError(
+                f"CSV API response error: {response.status_code}", response.status_code
+            )
 
         text = response.text
         # Use csv module to parse
@@ -162,12 +179,17 @@ class IzmirClient:
                         continue
                     val = v.strip().strip('"') if v else ""
                     # Convert to number if possible, but keep string if it contains special chars like : or -
-                    if val == "" or ":" in val or "-" in val or val.lower() in ("true", "false"):
+                    if (
+                        val == ""
+                        or ":" in val
+                        or "-" in val
+                        or val.lower() in ("true", "false")
+                    ):
                         cleaned_row[k] = val
                     else:
                         try:
                             # Try integer first
-                            if '.' in val:
+                            if "." in val:
                                 cleaned_row[k] = float(val)
                             else:
                                 cleaned_row[k] = int(val)

@@ -7,7 +7,9 @@ class AfetToplanmaAlanlari(DefaultOnemliYer):
 
 
 class AfetlerEndpoint(BaseEndpoint):
-    async def get_acil_durum_toplanma_alanlari(self) -> OnemliYerWrapper[AfetToplanmaAlanlari]:
+    async def get_acil_durum_toplanma_alanlari(
+        self,
+    ) -> OnemliYerWrapper[AfetToplanmaAlanlari]:
         """
         Afet ve acil durum toplanma alanlarına ait ilçe, mahalle ve konum bilgilerini içeren web servisi.
 

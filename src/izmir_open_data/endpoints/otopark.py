@@ -9,13 +9,16 @@ class OccupancyTotal(BaseModel):
     free: int
     occupied: int
 
+
 class OccupancyDisabled(BaseModel):
     free: int
     occupied: int
 
+
 class Occupancy(BaseModel):
     total: OccupancyTotal
     disabled: OccupancyDisabled | None = None
+
 
 class Accessibility(BaseModel):
     lpgAllowed: bool
@@ -24,21 +27,25 @@ class Accessibility(BaseModel):
     maxHeight: float
     maxWidth: float
 
+
 class Poi(BaseModel):
     metroStation: bool
     trainStation: bool
     busStation: bool
     tramStation: bool
 
+
 class Payment(BaseModel):
     cash: bool
     card: bool
     sms: bool
 
+
 class Accessories(BaseModel):
     covered: bool
     barrier: bool
     cctv: bool
+
 
 class OtoparkBilgisi(BaseModel):
     ufid: str
@@ -57,8 +64,10 @@ class OtoparkBilgisi(BaseModel):
     payment: Payment
     accessories: Accessories
 
+
 class OtoparkUcreti(BaseModel):
     """İzelman otopark ücret bilgisi (CKAN datasından)"""
+
     id: int = Field(alias="_id")
     otopark_fiyat: str = Field(alias="Otopark / Fiyat")
     saat_0_1: float | None = Field(None, alias="0-1 Saat")
@@ -79,10 +88,13 @@ class OtoparkUcreti(BaseModel):
     kayip_bilet: float | None = Field(None, alias="Kayıp Bilet")
     aylik_abone: float | None = Field(None, alias="Aylık Abone Ücreti")
     aylik_alan_abone: float | None = Field(None, alias="Aylık Alan Abonelik Ücreti")
-    motosiklet_aylik_abone: float | None = Field(None, alias="Motosiklet Aylık Abone Ücreti")
+    motosiklet_aylik_abone: float | None = Field(
+        None, alias="Motosiklet Aylık Abone Ücreti"
+    )
     engelli_0_12: float | None = Field(None, alias="0-12 Saat(Engelli Aracı )")
     engelli_12_24: float | None = Field(None, alias="12-24 Saat(Engelli Aracı )")
     engelli_0_24: float | None = Field(None, alias="0-24 Saat(Engelli Aracı )")
+
 
 class OtoparkEndpoint(BaseEndpoint):
     async def get_list(self) -> list[OtoparkBilgisi]:
@@ -106,7 +118,7 @@ class OtoparkEndpoint(BaseEndpoint):
             params={
                 "resource_id": "b45d2e9f-f258-476e-a12d-d0ff62471ee0",
                 "limit": limit,
-                "offset": offset
-            }
+                "offset": offset,
+            },
         )
         return response

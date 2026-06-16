@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class CografiYer(DefaultOnemliYer):
     pass
 
+
 class CografiEndpoint(BaseEndpoint):
     async def get_ada_yarimada_list(self) -> OnemliYerWrapper[CografiYer]:
         """

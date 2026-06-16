@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class KamuKurumu(DefaultOnemliYer):
     pass
 
+
 class KamuEndpoint(BaseEndpoint):
     async def get_bankalar_list(self) -> OnemliYerWrapper[KamuKurumu]:
         """

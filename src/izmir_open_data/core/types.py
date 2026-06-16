@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 T = TypeVar("T")
 
+
 class DefaultOnemliYer(BaseModel):
     id: int | None = Field(None, alias="Id")
     adi: str | None = Field(None, alias="Adi")
@@ -20,6 +21,7 @@ class DefaultOnemliYer(BaseModel):
     web_adresi: str | None = Field(None, alias="WebAdresi")
     resim_url: str | None = Field(None, alias="ResimUrl")
     yol_tarifi_kisa: str | None = Field(None, alias="YolTarifiKisa")
+
 
 class OnemliYerWrapper(BaseModel, Generic[T]):
     kayit_sayisi: int = Field(alias="kayit_sayisi")

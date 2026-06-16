@@ -13,18 +13,23 @@ class HavaKalitesiOlcum(BaseModel):
     gaz_adi: str = Field(alias="GazAdi")
     olcum_degeri: str = Field(alias="OlcumDegeri")
 
+
 class HavaKalitesiIstasyonu(BaseModel):
     """
     Hava kalitesi ölçüm istasyonu bilgisi (CSV datasından)
     """
+
     bolge: int | str = Field(alias="BOLGE", description="Bölge ID'si")
     ilce: str = Field(alias="ILCE", description="İlçe adı")
     istasyon_adi: str = Field(alias="ISTASYON_ADI", description="İstasyon adı")
     enlem: float | str = Field(alias="ENLEM", description="Enlem (latitude)")
     boylam: float | str = Field(alias="BOYLAM", description="Boylam (longitude)")
 
+
 class IklimEndpoint(BaseEndpoint):
-    async def get_gunluk_hava_kalitesi_olcumleri(self, tarih: date) -> list[HavaKalitesiOlcum]:
+    async def get_gunluk_hava_kalitesi_olcumleri(
+        self, tarih: date
+    ) -> list[HavaKalitesiOlcum]:
         """
         Belirtilen tarihe göre hava kalitesi ölçüm değerlerini içeren web servisi.
 
@@ -40,5 +45,5 @@ class IklimEndpoint(BaseEndpoint):
         Kaynak: https://acikveri.bizizmir.com/dataset/hava-kalitesi-olcum-istasyonlari
         """
         return await self._client.get_csv(
-            'https://acikveri.bizizmir.com/dataset/3712094a-ded4-40cf-ac94-2102eeb73cbc/resource/7b0edbda-350a-4240-b2c5-a4deb1b4bdfc/download/hava-kalitesi-olcum-istasyonlari.csv'
+            "https://acikveri.bizizmir.com/dataset/3712094a-ded4-40cf-ac94-2102eeb73cbc/resource/7b0edbda-350a-4240-b2c5-a4deb1b4bdfc/download/hava-kalitesi-olcum-istasyonlari.csv"
         )

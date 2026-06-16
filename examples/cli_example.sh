@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CLI (Komut Satırı Arayüzü) Kullanım Örneği
-# 
+#
 # Bu script, 'izmir-data' CLI aracının nasıl kullanılacağını gösterir.
 # Not: Çalıştırmadan önce projeyi kurduğunuzdan emin olun (örn: `uv pip install -e .`)
 

@@ -1,13 +1,13 @@
 """
 MCP (Model Context Protocol) Sunucusu Kullanım Örneği
 
-MCP sunucusu, AI asistanlarının (örneğin Claude Desktop veya Cursor) 
+MCP sunucusu, AI asistanlarının (örneğin Claude Desktop veya Cursor)
 İzmir Açık Veri API'sinden doğrudan veri çekmesine olanak tanır.
 
 Normalde, MCP sunucusunu doğrudan CLI komutu ile çalıştırırsınız:
 $ izmir-mcp
 
-Eğer FastMCP sunucusunu kendi projenizde genişletmek veya 
+Eğer FastMCP sunucusunu kendi projenizde genişletmek veya
 özel araçlar (tools) eklemek isterseniz aşağıdaki gibi yapabilirsiniz.
 """
 

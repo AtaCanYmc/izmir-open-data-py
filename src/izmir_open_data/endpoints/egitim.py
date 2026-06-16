@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class EgitimKurumu(DefaultOnemliYer):
     pass
 
+
 class EgitimEndpoint(BaseEndpoint):
     async def get_engelli_okullari_list(self) -> OnemliYerWrapper[EgitimKurumu]:
         """

@@ -4,7 +4,9 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 
 class TarihiYapi(DefaultOnemliYer):
     """Tarihi yapılar için interface"""
+
     pass
+
 
 class TarihiEndpoint(BaseEndpoint):
     async def get_antik_kentler_list(self) -> OnemliYerWrapper[TarihiYapi]:

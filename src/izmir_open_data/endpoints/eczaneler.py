@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel
 
 from izmir_open_data.endpoints.base import BaseEndpoint
@@ -13,6 +12,7 @@ class Eczane(BaseModel):
     LokasyonX: str
     LokasyonY: str
     Tarih: str
+
 
 class EczanelerEndpoint(BaseEndpoint):
     async def get_nobetci_list(self) -> list[Eczane]:

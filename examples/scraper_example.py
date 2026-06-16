@@ -1,10 +1,12 @@
 """
 Scraper (API Client) Kullanım Örneği
 
-Bu örnek, IzmirClient kullanarak İzmir Açık Veri Portalı'ndan asenkron olarak 
+Bu örnek, IzmirClient kullanarak İzmir Açık Veri Portalı'ndan asenkron olarak
 nasıl veri çekileceğini gösterir.
 """
+
 import asyncio
+
 from izmir_open_data.core.client import IzmirClient
 
 
@@ -14,9 +16,9 @@ async def main():
     async with IzmirClient() as client:
         print("'afet_toplanma_alanlari' veriseti çekiliyor...")
         data = await client.afetler.get_acil_durum_toplanma_alanlari()
-        
+
         print("\nVeri başarıyla çekildi!")
-        
+
         if "kayitlar" in data:
             print(f"Toplam kayıt sayısı: {data.get('kayit_sayisi')}")
             print("İlk 2 kayıt:")

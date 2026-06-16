@@ -9,19 +9,23 @@ class VapurSeferSaati(BaseModel):
     KalkisSaati: str | None = None
     VarisSaati: str | None = None
 
+
 class VapurSeferSatiri(BaseModel):
     seferSaatleri: list[VapurSeferSaati]
     IptalMi: bool
     IptalAciklama: str
     Aciklama: str
 
+
 class VapurHatti(BaseModel):
     hatAdi: str
     iskeleler: list[str]
     seferSatirlari: list[VapurSeferSatiri]
 
+
 class VapurVarisYeri(BaseModel):
     iskeleAdi: str
+
 
 class DetayliVapurSeferi(BaseModel):
     arabaliVapurSeferi: bool
@@ -31,9 +35,11 @@ class DetayliVapurSeferi(BaseModel):
     IptalMi: bool | None = None
     IptalAciklama: str | None = None
 
+
 class GunlukVapurPlani(BaseModel):
     gunId: int
     seferler: list[DetayliVapurSeferi]
+
 
 class VapurIskele(BaseModel):
     IskeleId: int
@@ -43,11 +49,13 @@ class VapurIskele(BaseModel):
     AktifMi: bool
     ArabaliVapurIskelesiMi: bool
 
+
 class VapurDetay(BaseModel):
     """
     Vapur detay bilgisi (CSV datasından)
     Gemilerin kapasite ve donanım özellikleri
     """
+
     GEMI_ADI: str
     GEMI_TIPI: str
     YOLCU_KAPASITESI: int | str
@@ -63,13 +71,18 @@ class VapurDetay(BaseModel):
     EVCIL_HAYVAN_TASIMA_KAFESI_SAYISI: int | str
     WIZMIRNET_KABLOSUZ_INTERNET: str
 
+
 class VapurEndpoint(BaseEndpoint):
-    async def get_hareket_saatleri(self, kalkis: str, varis: str, gun_tipi: int, detay: int = 0) -> Any:
+    async def get_hareket_saatleri(
+        self, kalkis: str, varis: str, gun_tipi: int, detay: int = 0
+    ) -> Any:
         """
         Vapur hareket saatleri bilgisini içeren web servisi.
         Kaynak: https://acikveri.bizizmir.com/dataset/vapur-hareket-saatleri
         """
-        return await self._client.get(f"izdeniz/vapursaatleri/{kalkis}/{varis}/{gun_tipi}/{detay}")
+        return await self._client.get(
+            f"izdeniz/vapursaatleri/{kalkis}/{varis}/{gun_tipi}/{detay}"
+        )
 
     async def get_calisma_gunleri(self) -> Any:
         """
@@ -78,12 +91,16 @@ class VapurEndpoint(BaseEndpoint):
         """
         return await self._client.get("izdeniz/gunler")
 
-    async def get_hareket_saatleri_by_hat(self, iskele_id: str, gun_id: int) -> list[VapurHatti]:
+    async def get_hareket_saatleri_by_hat(
+        self, iskele_id: str, gun_id: int
+    ) -> list[VapurHatti]:
         """
         İskele bazlı vapur hareket saatleri bilgisini içeren web servisi.
         Kaynak: https://acikveri.bizizmir.com/dataset/vapur-hareket-saatleri
         """
-        return await self._client.get(f"izdeniz/iskelesefersaatleri/{iskele_id}/{gun_id}")
+        return await self._client.get(
+            f"izdeniz/iskelesefersaatleri/{iskele_id}/{gun_id}"
+        )
 
     async def get_iskele_list(self) -> list[VapurIskele]:
         """
@@ -99,5 +116,5 @@ class VapurEndpoint(BaseEndpoint):
         Kaynak: https://acikveri.bizizmir.com/dataset/vapur-detay
         """
         return await self._client.get_csv(
-            'https://acikveri.bizizmir.com/dataset/87b38b23-4f73-4650-9d96-c72ad6ee73e3/resource/e6d7425a-694c-4f39-b452-4aade132635c/download/vapurdetay.csv'
+            "https://acikveri.bizizmir.com/dataset/87b38b23-4f73-4650-9d96-c72ad6ee73e3/resource/e6d7425a-694c-4f39-b452-4aade132635c/download/vapurdetay.csv"
         )

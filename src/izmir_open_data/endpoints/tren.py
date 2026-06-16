@@ -4,7 +4,9 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 
 class UlasimNoktasi(DefaultOnemliYer):
     """Ulaşım noktası için interface"""
+
     pass
+
 
 class TrenEndpoint(BaseEndpoint):
     async def get_tren_garlari_list(self) -> OnemliYerWrapper[UlasimNoktasi]:
@@ -28,7 +30,9 @@ class TrenEndpoint(BaseEndpoint):
         """
         return await self._client.get("ibb/cbs/otobusterminalleri")
 
-    async def get_arac_muayene_istasyonlari_list(self) -> OnemliYerWrapper[UlasimNoktasi]:
+    async def get_arac_muayene_istasyonlari_list(
+        self,
+    ) -> OnemliYerWrapper[UlasimNoktasi]:
         """
         Araç muayene istasyonları konum bilgilerini içeren web servisi.
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/aracmuayeneistasyonlari

@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class HizmetNoktasi(DefaultOnemliYer):
     pass
 
+
 class HizmetEndpoint(BaseEndpoint):
     async def get_hizmet_nokta_list(self) -> OnemliYerWrapper[HizmetNoktasi]:
         """

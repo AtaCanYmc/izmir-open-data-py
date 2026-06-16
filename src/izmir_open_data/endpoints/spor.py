@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel
 
 from izmir_open_data.core.types import DefaultOnemliYer, OnemliYerWrapper
@@ -70,5 +69,4 @@ class SporEndpoint(BaseEndpoint):
         """
         return await self._client.get_csv(
             "https://acikveri.bizizmir.com/dataset/48fa21a3-b286-40f2-a286-28aa9dc328df/resource/4896beb8-0139-4135-9475-d790c18bbb19/download/yuruyus-yollar.csv",
-            response_model=YuruyusYolu,
         )

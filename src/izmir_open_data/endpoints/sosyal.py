@@ -37,7 +37,8 @@ class SosyalEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/cocukyuvalari
         """
         return await self._client.get(
-            "ibb/cbs/cocukyuvalari", response_model=OnemliYerWrapper[SosyalHizmetMerkezi]
+            "ibb/cbs/cocukyuvalari",
+            response_model=OnemliYerWrapper[SosyalHizmetMerkezi],
         )
 
     async def get_huzurevleri_list(self) -> OnemliYerWrapper[SosyalHizmetMerkezi]:
@@ -55,7 +56,8 @@ class SosyalEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/toplummerkezleri
         """
         return await self._client.get(
-            "ibb/cbs/toplummerkezleri", response_model=OnemliYerWrapper[SosyalHizmetMerkezi]
+            "ibb/cbs/toplummerkezleri",
+            response_model=OnemliYerWrapper[SosyalHizmetMerkezi],
         )
 
     async def get_yetistirme_yurtlari_list(

@@ -7,9 +7,11 @@ class AskidaIzmirimKartIstatistik(BaseModel):
     """
     Askıda İzmirim Kart istatistik bilgileri
     """
+
     AskidaBekleyenKart: int
     AskidanAlinanKart: int
     ToplamOdenenTutar: float
+
 
 class IztekEndpoint(BaseEndpoint):
     async def get_askida_izmirim_kart_istatistik(self) -> AskidaIzmirimKartIstatistik:

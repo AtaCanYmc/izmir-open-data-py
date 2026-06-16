@@ -1,6 +1,6 @@
 # Izmir Open Data Python Client 🏙️
 
-Izmir Büyükşehir Belediyesi Açık Veri Portalı için resmi olmayan Python kütüphanesi ve MCP (Model Context Protocol) sunucusu. 
+Izmir Büyükşehir Belediyesi Açık Veri Portalı için resmi olmayan Python kütüphanesi ve MCP (Model Context Protocol) sunucusu.
 
 Bu kütüphane `izmir-open-data-js` projesinin Python karşılığıdır.
 

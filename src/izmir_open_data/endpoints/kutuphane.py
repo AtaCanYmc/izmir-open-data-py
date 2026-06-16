@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class KulturMekani(DefaultOnemliYer):
     pass
 
+
 class KutuphaneEndpoint(BaseEndpoint):
     async def get_kutuphaneler_list(self) -> OnemliYerWrapper[KulturMekani]:
         """

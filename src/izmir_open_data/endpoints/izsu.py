@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, Field
 
 from izmir_open_data.endpoints.base import BaseEndpoint
@@ -10,21 +9,25 @@ class SuUretimi(BaseModel):
     yil: int = Field(alias="Yil")
     ay: int = Field(alias="Ay")
 
+
 class BarajKuyuUretim(BaseModel):
     tur_adi: str = Field(alias="TurAdi")
     baraj_kuyu_adi: str = Field(alias="BarajKuyuAdi")
     baraj_kuyu_id: int = Field(alias="BarajKuyuId")
     uretim_miktari: float = Field(alias="UretimMiktari")
 
+
 class GunlukUretimResponse(BaseModel):
     uretim_tarihi: str = Field(alias="UretimTarihi")
     baraj_kuyu_uretimleri: list[BarajKuyuUretim] = Field(alias="BarajKuyuUretimleri")
+
 
 class SuKaynagi(BaseModel):
     adi: str = Field(alias="Adi")
     enlem: float | None = Field(alias="Enlem", default=None)
     boylam: float | None = Field(alias="Boylam", default=None)
     tur_adi: str = Field(alias="TurAdi")
+
 
 class BarajSuDurumu(BaseModel):
     su_durumu: float = Field(alias="SuDurumu")
@@ -34,7 +37,9 @@ class BarajSuDurumu(BaseModel):
     boylam: float | None = Field(alias="Boylam", default=None)
     tuketilebilir_su_kapasitesi: float = Field(alias="TuketilebilirSuKapasitesi")
     maksimum_su_kapasitesi: float = Field(alias="MaksimumSuKapasitesi")
-    baraj_su_durumu_gosterimi: str | None = Field(alias="BarajSuDurumuGosterimi", default=None)
+    baraj_su_durumu_gosterimi: str | None = Field(
+        alias="BarajSuDurumuGosterimi", default=None
+    )
     minimum_su_yuksekligi: float = Field(alias="MinimumSuYuksekligi")
     doluluk_orani: float = Field(alias="DolulukOrani")
     durum_tarihi: str = Field(alias="DurumTarihi")
@@ -42,6 +47,7 @@ class BarajSuDurumu(BaseModel):
     enlem: float | None = Field(alias="Enlem", default=None)
     baraj_kuyu_id: int = Field(alias="BarajKuyuId")
     maksimum_su_yuksekligi: float = Field(alias="MaksimumSuYuksekligi")
+
 
 class SuAnalizSonucu(BaseModel):
     parametre_kodu: str = Field(alias="ParametreKodu")
@@ -53,13 +59,16 @@ class SuAnalizSonucu(BaseModel):
     sonuc_tarihi: str = Field(alias="SonucTarihi")
     nokta_kodu: str = Field(alias="NoktaKodu")
 
+
 class SuAnalizKaydi(BaseModel):
     tarih: str = Field(alias="Tarih")
     nokta_tanimi: str = Field(alias="NoktaTanimi")
     analiz_sonuclari: list[SuAnalizSonucu] = Field(alias="analizSonuclari")
 
+
 class SuAnalizResponse(BaseModel):
     tum_analizler: list[SuAnalizKaydi] = Field(alias="TumAnalizler")
+
 
 class BarajKaliteAnalizi(BaseModel):
     parametre_adi: str = Field(alias="ParametreAdi")
@@ -69,15 +78,19 @@ class BarajKaliteAnalizi(BaseModel):
     islenmemis_su: str = Field(alias="IslenmemisSu")
     regulasyon: str | None = Field(alias="Regulasyon", default=None)
 
+
 class BarajAnalizGrubu(BaseModel):
     analiz_elemanlari: list[BarajKaliteAnalizi] = Field(alias="AnalizElemanlari")
+
 
 class BarajAnalizKaydi(BaseModel):
     tarih: str = Field(alias="Tarih")
     analizler: list[BarajAnalizGrubu] = Field(alias="Analizler")
 
+
 class BarajAnalizResponse(BaseModel):
     baraj_analizleri: list[BarajAnalizKaydi] = Field(alias="BarajAnalizleri")
+
 
 class KesintiBilgisi(BaseModel):
     kesinti_tarihi: str = Field(alias="KesintiTarihi")
@@ -97,6 +110,7 @@ class KesintiBilgisi(BaseModel):
     kesinti_suresi: str = Field(alias="KesintiSuresi")
     ongoru: str = Field(alias="Ongoru")
 
+
 class IzsuSubeBilgisi(BaseModel):
     aktif_mi: bool = Field(alias="AktifMi")
     sube_adresi: str = Field(alias="SubeAdresi")
@@ -106,6 +120,7 @@ class IzsuSubeBilgisi(BaseModel):
     sube_adi: str = Field(alias="SubeAdi")
     sube_telefon: str = Field(alias="SubeTelefon")
 
+
 class IzsuVezneBilgisi(BaseModel):
     vezne_adi: str = Field(alias="VezneAdi")
     vezne_adresi: str | None = Field(alias="VezneAdresi", default=None)
@@ -113,6 +128,7 @@ class IzsuVezneBilgisi(BaseModel):
     boylam: str | None = Field(alias="BOYLAM", default=None)
     aktif_mi: bool = Field(alias="AktifMi")
     bolge: str = Field(alias="Bolge")
+
 
 class IzsuEndpoint(BaseEndpoint):
     async def get_su_uretimi_dagilimi(self) -> list[SuUretimi]:

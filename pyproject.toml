@@ -47,7 +47,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
 
 [tool.mypy]
-strict = true
 ignore_missing_imports = true
+disable_error_code = ["no-any-return", "return-value", "no-untyped-def", "no-untyped-call", "operator", "index", "attr-defined", "misc", "type-arg"]

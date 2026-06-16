@@ -5,6 +5,7 @@ from izmir_open_data.endpoints.base import BaseEndpoint
 class Muhtarlik(DefaultOnemliYer):
     pass
 
+
 class MuhtarliklarEndpoint(BaseEndpoint):
     async def get_list(self) -> OnemliYerWrapper[Muhtarlik]:
         """

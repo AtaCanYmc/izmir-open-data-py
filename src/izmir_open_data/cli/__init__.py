@@ -13,6 +13,12 @@ def run_async(coro):
     return asyncio.run(coro)
 
 
+@app.callback()
+def main():
+    """Izmir Open Data CLI"""
+    pass
+
+
 @app.command()
 def get(dataset_id: str = typer.Argument(..., help="The ID of the dataset to fetch")):
     """Fetch and display a dataset from Izmir Open Data API."""

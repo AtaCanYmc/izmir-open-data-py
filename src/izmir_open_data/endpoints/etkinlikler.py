@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, Field
 
 from izmir_open_data.endpoints.base import BaseEndpoint
@@ -17,6 +16,7 @@ class IzmirEtkinlik(BaseModel):
     resim: str = Field(alias="Resim")
     etkinlik_url: str = Field(alias="EtkinlikUrl")
     etkinlik_baslama_tarihi: str = Field(alias="EtkinlikBaslamaTarihi")
+
 
 class EtkinliklerEndpoint(BaseEndpoint):
     async def get_list(self) -> list[IzmirEtkinlik]:
