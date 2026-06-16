@@ -6,7 +6,7 @@ nasıl veri çekileceğini gösterir.
 """
 import asyncio
 import json
-from src.izmir_open_data.scraper import IzmirClient
+from src.izmir_open_data.core.client import IzmirClient
 
 
 async def main():

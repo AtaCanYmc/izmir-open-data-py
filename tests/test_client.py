@@ -1,5 +1,7 @@
 import pytest
-from izmir_open_data.scraper import IzmirClient
+
+from src.izmir_open_data.core.client import IzmirClient
+
 
 @pytest.mark.asyncio
 async def test_client_initialization():

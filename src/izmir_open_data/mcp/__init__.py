@@ -1,5 +1,6 @@
 from fastmcp import FastMCP
-from src.izmir_open_data.scraper import IzmirClient
+
+from src.izmir_open_data.core.client import IzmirClient
 
 # Initialize FastMCP server
 mcp = FastMCP("izmir-open-data", description="Izmir Open Data MCP Server")
@@ -14,7 +15,7 @@ async def get_dataset(dataset_id: str) -> dict:
         dataset_id: The ID of the dataset to fetch (e.g., 'hal-fiyatlari')
     """
     async with IzmirClient() as client:
-        data = await client.get_dataset(dataset_id)
+        data = await client.get(f"ibb/{dataset_id}")
         return data
 
 

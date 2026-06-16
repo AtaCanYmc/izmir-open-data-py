@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Izmir Open Data API Client and MCP Server"
 readme = "README.md"
 authors = [
-    { name = "Ata Can", email = "ata.can@example.com" }
+    { name = "Ata Can", email = "atacanymc@gmail.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
@@ -12,7 +12,8 @@ dependencies = [
     "pydantic>=2.7.0",
     "typer>=0.12.0",
     "fastmcp>=0.1.0",
-    "rich>=13.0.0"
+    "rich>=13.0.0",
+    "beautifulsoup4>=4.12.0"
 ]
 
 [project.optional-dependencies]
@@ -29,12 +30,18 @@ izmir-data = "izmir_open_data.cli:app"
 izmir-mcp = "izmir_open_data.mcp:main"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
