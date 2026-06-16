@@ -1,6 +1,6 @@
 import pytest
 
-from src.izmir_open_data.core.client import IzmirClient
+from izmir_open_data.core.client import IzmirClient
 
 
 @pytest.mark.asyncio

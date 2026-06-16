@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.izmir_open_data.core.client import IzmirClient
+    from izmir_open_data.core.client import IzmirClient
 
 class BaseEndpoint:
     """Base class for all Izmir Open Data API endpoint groups."""

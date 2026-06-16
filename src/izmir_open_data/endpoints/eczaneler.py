@@ -1,7 +1,7 @@
 
 from pydantic import BaseModel
 
-from src.izmir_open_data.endpoints.base import BaseEndpoint
+from izmir_open_data.endpoints.base import BaseEndpoint
 
 
 class Eczane(BaseModel):

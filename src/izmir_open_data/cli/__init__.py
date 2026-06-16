@@ -3,7 +3,7 @@ import asyncio
 import typer
 from rich.console import Console
 
-from src.izmir_open_data.core.client import IzmirClient
+from izmir_open_data.core.client import IzmirClient
 
 app = typer.Typer(help="Izmir Open Data CLI")
 console = Console()

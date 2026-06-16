@@ -1,5 +1,5 @@
-from src.izmir_open_data.core.types import DefaultOnemliYer, OnemliYerWrapper
-from src.izmir_open_data.endpoints.base import BaseEndpoint
+from izmir_open_data.core.types import DefaultOnemliYer, OnemliYerWrapper
+from izmir_open_data.endpoints.base import BaseEndpoint
 
 
 class CografiYer(DefaultOnemliYer):

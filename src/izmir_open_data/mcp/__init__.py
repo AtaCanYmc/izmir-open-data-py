@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 
-from src.izmir_open_data.core.client import IzmirClient
+from izmir_open_data.core.client import IzmirClient
 
 # Initialize FastMCP server
 mcp = FastMCP("izmir-open-data", description="Izmir Open Data MCP Server")

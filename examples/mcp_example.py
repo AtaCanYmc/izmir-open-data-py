@@ -11,7 +11,7 @@ Eğer FastMCP sunucusunu kendi projenizde genişletmek veya
 özel araçlar (tools) eklemek isterseniz aşağıdaki gibi yapabilirsiniz.
 """
 
-from src.izmir_open_data.mcp import mcp
+from izmir_open_data.mcp import mcp
 
 
 # Mevcut MCP sunucusuna yeni, özel bir araç (tool) ekleyelim

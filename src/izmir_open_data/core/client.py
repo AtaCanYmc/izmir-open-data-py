@@ -3,37 +3,37 @@ import io
 from typing import Any
 import httpx
 
-from src.izmir_open_data.core.exceptions import APIError
-from src.izmir_open_data.endpoints.afetler import AfetlerEndpoint
-from src.izmir_open_data.endpoints.bisim import BisimEndpoint
-from src.izmir_open_data.endpoints.cografi import CografiEndpoint
-from src.izmir_open_data.endpoints.eczaneler import EczanelerEndpoint
-from src.izmir_open_data.endpoints.egitim import EgitimEndpoint
-from src.izmir_open_data.endpoints.eshot import EshotEndpoint
-from src.izmir_open_data.endpoints.etkinlikler import EtkinliklerEndpoint
-from src.izmir_open_data.endpoints.hizmet import HizmetEndpoint
-from src.izmir_open_data.endpoints.iklim import IklimEndpoint
-from src.izmir_open_data.endpoints.izban import IzbanEndpoint
-from src.izmir_open_data.endpoints.izmirimkart import IzmirimKartEndpoint
-from src.izmir_open_data.endpoints.izsu import IzsuEndpoint
-from src.izmir_open_data.endpoints.iztek import IztekEndpoint
-from src.izmir_open_data.endpoints.kamu import KamuEndpoint
-from src.izmir_open_data.endpoints.kutuphane import KutuphaneEndpoint
-from src.izmir_open_data.endpoints.metro import MetroEndpoint
-from src.izmir_open_data.endpoints.muhtarliklar import MuhtarliklarEndpoint
-from src.izmir_open_data.endpoints.otopark import OtoparkEndpoint
-from src.izmir_open_data.endpoints.pazarlar import PazarlarEndpoint
-from src.izmir_open_data.endpoints.plaj import PlajEndpoint
-from src.izmir_open_data.endpoints.saglik import SaglikEndpoint
-from src.izmir_open_data.endpoints.sosyal import SosyalEndpoint
-from src.izmir_open_data.endpoints.spor import SporEndpoint
-from src.izmir_open_data.endpoints.taksi import TaksiEndpoint
-from src.izmir_open_data.endpoints.tarihi import TarihiEndpoint
-from src.izmir_open_data.endpoints.trafik import TrafikEndpoint
-from src.izmir_open_data.endpoints.tramvay import TramvayEndpoint
-from src.izmir_open_data.endpoints.tren import TrenEndpoint
-from src.izmir_open_data.endpoints.vapur import VapurEndpoint
-from src.izmir_open_data.endpoints.wizmirnet import WizmirnetEndpoint
+from izmir_open_data.core.exceptions import APIError
+from izmir_open_data.endpoints.afetler import AfetlerEndpoint
+from izmir_open_data.endpoints.bisim import BisimEndpoint
+from izmir_open_data.endpoints.cografi import CografiEndpoint
+from izmir_open_data.endpoints.eczaneler import EczanelerEndpoint
+from izmir_open_data.endpoints.egitim import EgitimEndpoint
+from izmir_open_data.endpoints.eshot import EshotEndpoint
+from izmir_open_data.endpoints.etkinlikler import EtkinliklerEndpoint
+from izmir_open_data.endpoints.hizmet import HizmetEndpoint
+from izmir_open_data.endpoints.iklim import IklimEndpoint
+from izmir_open_data.endpoints.izban import IzbanEndpoint
+from izmir_open_data.endpoints.izmirimkart import IzmirimKartEndpoint
+from izmir_open_data.endpoints.izsu import IzsuEndpoint
+from izmir_open_data.endpoints.iztek import IztekEndpoint
+from izmir_open_data.endpoints.kamu import KamuEndpoint
+from izmir_open_data.endpoints.kutuphane import KutuphaneEndpoint
+from izmir_open_data.endpoints.metro import MetroEndpoint
+from izmir_open_data.endpoints.muhtarliklar import MuhtarliklarEndpoint
+from izmir_open_data.endpoints.otopark import OtoparkEndpoint
+from izmir_open_data.endpoints.pazarlar import PazarlarEndpoint
+from izmir_open_data.endpoints.plaj import PlajEndpoint
+from izmir_open_data.endpoints.saglik import SaglikEndpoint
+from izmir_open_data.endpoints.sosyal import SosyalEndpoint
+from izmir_open_data.endpoints.spor import SporEndpoint
+from izmir_open_data.endpoints.taksi import TaksiEndpoint
+from izmir_open_data.endpoints.tarihi import TarihiEndpoint
+from izmir_open_data.endpoints.trafik import TrafikEndpoint
+from izmir_open_data.endpoints.tramvay import TramvayEndpoint
+from izmir_open_data.endpoints.tren import TrenEndpoint
+from izmir_open_data.endpoints.vapur import VapurEndpoint
+from izmir_open_data.endpoints.wizmirnet import WizmirnetEndpoint
 
 
 class IzmirClient:
@@ -56,7 +56,7 @@ class IzmirClient:
             headers["Authorization"] = f"Bearer {api_key}"
 
         # We don't set base_url here because we request from multiple different base URLs
-        self._client = httpx.AsyncClient(headers=headers)
+        self._client = httpx.AsyncClient(headers=headers, timeout=30.0)
 
         # Endpoints will be attached dynamically or initialized later
         self._init_endpoints()
@@ -94,15 +94,20 @@ class IzmirClient:
         self.vapur = VapurEndpoint(self)
         self.wizmirnet = WizmirnetEndpoint(self)
 
-    async def get(self, path: str) -> Any:
+    async def get(self, path: str, response_model: Any = None) -> Any:
         """Standard API fetch."""
         url = f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
         response = await self._client.get(url)
         if not response.is_success:
             raise APIError(f"API response error: {response.status_code}", response.status_code)
-        return response.json()
+        
+        data = response.json()
+        if response_model:
+            from pydantic import TypeAdapter
+            return TypeAdapter(response_model).validate_python(data)
+        return data
 
-    async def get_ckan(self, action: str, params: dict[str, Any] | None = None) -> Any:
+    async def get_ckan(self, action: str, params: dict[str, Any] | None = None, response_model: Any = None) -> Any:
         """Fetch from CKAN API."""
         url = f"{self.ckan_base_url.rstrip('/')}/{action.lstrip('/')}"
         response = await self._client.get(url, params=params or {})
@@ -111,18 +116,27 @@ class IzmirClient:
 
         data = response.json()
         if data.get("success"):
-            return data.get("result")
+            result = data.get("result")
+            if response_model:
+                from pydantic import TypeAdapter
+                return TypeAdapter(response_model).validate_python(result)
+            return result
         else:
             error_msg = data.get("error", {}).get("message", "Unknown CKAN error")
             raise APIError(f"CKAN Error: {error_msg}")
 
-    async def get_ckan_dump(self, resource_id: str) -> Any:
+    async def get_ckan_dump(self, resource_id: str, response_model: Any = None) -> Any:
         """Fetch from CKAN Dump API."""
         url = f"{self.ckan_dump_base_url.rstrip('/')}/{resource_id.lstrip('/')}?format=json"
         response = await self._client.get(url, timeout=30.0)
         if not response.is_success:
             raise APIError(f"CKAN Dump API response error: {response.status_code}", response.status_code)
-        return response.json()
+            
+        data = response.json()
+        if response_model:
+            from pydantic import TypeAdapter
+            return TypeAdapter(response_model).validate_python(data)
+        return data
 
     async def get_csv(self, url: str, delimiter: str = ";") -> list[dict[str, Any]]:
         """Fetch and parse CSV data."""

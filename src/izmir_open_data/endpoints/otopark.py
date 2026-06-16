@@ -2,7 +2,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from src.izmir_open_data.endpoints.base import BaseEndpoint
+from izmir_open_data.endpoints.base import BaseEndpoint
 
 
 class OccupancyTotal(BaseModel):

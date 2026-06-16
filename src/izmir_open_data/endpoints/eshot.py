@@ -4,12 +4,13 @@ import httpx
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
-from src.izmir_open_data.core.types import DefaultOnemliYer, OnemliYerWrapper
-from src.izmir_open_data.endpoints.base import BaseEndpoint
+from izmir_open_data.core.types import DefaultOnemliYer, OnemliYerWrapper
+from izmir_open_data.endpoints.base import BaseEndpoint
 
 
 class EshotDurak(DefaultOnemliYer):
     pass
+
 
 class EshotHat(BaseModel):
     HAT_NO: int
@@ -18,6 +19,7 @@ class EshotHat(BaseModel):
     ACIKLAMA: str
     HAT_BASLANGIC: str
     HAT_BITIS: str
+
 
 class EshotHareketSaati(BaseModel):
     HAT_NO: int
@@ -32,6 +34,7 @@ class EshotHareketSaati(BaseModel):
     GIDIS_ELEKTRIKLI_OTOBUS: str
     DONUS_ELEKTRIKLI_OTOBUS: str
 
+
 class EshotDurakCSV(BaseModel):
     DURAK_ID: int
     DURAK_ADI: str
@@ -39,15 +42,18 @@ class EshotDurakCSV(BaseModel):
     BOYLAM: float
     DURAKTAN_GECEN_HATLAR: str
 
+
 class EshotHatGuzergah(BaseModel):
     HAT_NO: int
     YON: int
     BOYLAM: float
     ENLEM: float
 
+
 class EshotBaglantiTipi(BaseModel):
     BAGLANTI_TIP_ID: int
     BAGLANTI_TIPI: str
+
 
 class EshotBaglantiHat(BaseModel):
     BAGLANTI_TIP_ID: int
@@ -60,6 +66,7 @@ class EshotBaglantiHat(BaseModel):
     GIDIS_CALISMA_SAATI: str
     DONUS_CALISMA_SAATI: str
 
+
 class YaklasanOtobus(BaseModel):
     KalanDurakSayisi: int
     HattinYonu: int
@@ -71,6 +78,7 @@ class YaklasanOtobus(BaseModel):
     HatAdi: str
     OtobusId: int
 
+
 class EshotSiraliDurak(BaseModel):
     hatNo: str
     yon: int
@@ -78,9 +86,11 @@ class EshotSiraliDurak(BaseModel):
     durakId: str
     sira: int
 
+
 class HatOtobusKonumlariResponse(BaseModel):
     HataMesaj: str
     HatOtobusKonumlari: list[YaklasanOtobus]
+
 
 class EshotEndpoint(BaseEndpoint):
     async def get_hatlar(self) -> list[EshotHat]:
@@ -118,7 +128,8 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv
         """
-        return await self._client.get_csv('https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv')
+        return await self._client.get_csv(
+            'https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-hat-guzergahlari.csv')
 
     async def get_baglanti_tipleri(self) -> list[EshotBaglantiTipi]:
         """
@@ -127,7 +138,8 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://acikveri.bizizmir.com/dataset/otobus-hatlarinin-diger-ulasim-araclari-ile-baglanti-tipleri
         """
-        return await self._client.get_csv('https://acikveri.bizizmir.com/dataset/f0964595-53e0-4b94-bf11-9423f8bb595e/resource/c228da75-adfd-422a-a480-2a4c7ffa7586/download/eshot-otobus-baglanti-tipleri.csv')
+        return await self._client.get_csv(
+            'https://acikveri.bizizmir.com/dataset/f0964595-53e0-4b94-bf11-9423f8bb595e/resource/c228da75-adfd-422a-a480-2a4c7ffa7586/download/eshot-otobus-baglanti-tipleri.csv')
 
     async def get_baglanti_hatlari(self) -> list[EshotBaglantiHat]:
         """
@@ -136,7 +148,8 @@ class EshotEndpoint(BaseEndpoint):
 
         Kaynak: https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv
         """
-        return await self._client.get_csv('https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv')
+        return await self._client.get_csv(
+            'https://openfiles.izmir.bel.tr/211488/docs/eshot-otobus-baglantili-hatlar.csv')
 
     async def get_yakin_durak_list(self, enlem: float, boylam: float) -> OnemliYerWrapper[EshotDurak]:
         """
@@ -199,7 +212,7 @@ class EshotEndpoint(BaseEndpoint):
                 )
                 response.raise_for_status()
                 html = response.text
-                
+
                 soup = BeautifulSoup(html, 'html.parser')
                 stops = []
                 for block in soup.select('.block-transfer'):
@@ -208,7 +221,7 @@ class EshotEndpoint(BaseEndpoint):
                         stops = [li.text.strip() for li in ul.select('li.ring')]
                         if stops:
                             break
-                            
+
                 result = []
                 for idx, durak in enumerate(stops):
                     parts = durak.split(' - ')

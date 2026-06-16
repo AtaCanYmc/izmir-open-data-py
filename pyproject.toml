@@ -33,15 +33,17 @@ izmir-mcp = "izmir_open_data.mcp:main"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
+namespaces = false
 
 [tool.ruff]
 line-length = 88
 target-version = "py311"
 
-[tool.setuptools.packages.find]
-where = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
