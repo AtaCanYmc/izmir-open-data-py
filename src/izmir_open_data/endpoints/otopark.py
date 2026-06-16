@@ -103,6 +103,13 @@ class OtoparkEndpoint(BaseEndpoint):
 
         Kaynak: https://acikveri.bizizmir.com/dataset/otopark-doluluk-ve-lokasyon-bilgileri
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (otoparklar) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         response = await self._client.get("izum/otoparklar")
         return [OtoparkBilgisi.model_validate(item) for item in response]
 

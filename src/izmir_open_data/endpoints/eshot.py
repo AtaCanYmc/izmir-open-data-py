@@ -164,10 +164,16 @@ class EshotEndpoint(BaseEndpoint):
         self, enlem: float, boylam: float
     ) -> OnemliYerWrapper[EshotDurak]:
         """
-        ESHOT duraklarının konum, isim ve diğer bilgilerini içeren web servisi.
-
-        Kaynak: https://acikveri.bizizmir.com/dataset/eshot-duraklari
+        Koordinat (enlem, boylam) değerlerine göre en yakın durakları listeler.
+        Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/yakinduraklar
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (yakinduraklar) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._client.get(
             f"ibb/cbs/noktayayakinduraklar?x={enlem}&y={boylam}"
         )

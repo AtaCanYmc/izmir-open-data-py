@@ -80,10 +80,20 @@ class TramvayEndpoint(BaseEndpoint):
 
     async def get_sefer_list(self) -> list[TramvaySefer]:
         """
-        Tüm tramvay sefer bilgilerini içeren web servisi.
-        Kaynak: https://openapi.izmir.bel.tr/api/tramvay/sefer
+        Tramvay sefer ve istasyon id bilgilerini içeren web servisi.
+
+        Kaynak: https://acikveri.bizizmir.com/dataset/tramvay-seferleri
         """
-        return await self._client.get("tramvay/sefer")
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (seferler) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return await self._client.get(
+            "tramvay/seferler", response_model=list[TramvaySefer]
+        )
 
     async def get_istasyon_list(self, sefer_id: int) -> list[TramvayIstasyonu]:
         """

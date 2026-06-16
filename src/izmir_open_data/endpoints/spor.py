@@ -36,6 +36,13 @@ class SporEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/hipodrom
         @deprecated API'de henüz aktif değil
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (hipodrom) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._client.get(
             "ibb/cbs/hipodrom", response_model=OnemliYerWrapper[SporTesisi]
         )
@@ -46,6 +53,13 @@ class SporEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/sporsalonlari
         @deprecated API'de henüz aktif değil
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (sporsalonlari) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._client.get(
             "ibb/cbs/sporsalonlari", response_model=OnemliYerWrapper[SporTesisi]
         )
@@ -56,6 +70,13 @@ class SporEndpoint(BaseEndpoint):
         Kaynak: https://openapi.izmir.bel.tr/api/ibb/cbs/stadyumlar
         @deprecated API'de henüz aktif değil
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (stadyumlar) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._client.get(
             "ibb/cbs/stadyumlar", response_model=OnemliYerWrapper[SporTesisi]
         )

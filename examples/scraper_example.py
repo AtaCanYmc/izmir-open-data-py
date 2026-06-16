@@ -15,7 +15,7 @@ async def main():
     # Async context manager (async with) kullanımı bağlantıların düzgün kapanmasını sağlar.
     async with IzmirClient() as client:
         print("'afet_toplanma_alanlari' veriseti çekiliyor...")
-        data = await client.afetler.get_acil_durum_toplanma_alanlari()
+        data = await client.eczaneler.get_list()
 
         print("\nVeri başarıyla çekildi!")
 

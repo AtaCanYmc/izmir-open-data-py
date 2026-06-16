@@ -84,6 +84,13 @@ class IzbanEndpoint(BaseEndpoint):
             kalkis_istasyon_id: Kalkış istasyonu ID'si
             varis_istasyon_id: Varış istasyonu ID'si
         """
+        import warnings
+
+        warnings.warn(
+            "Bu endpoint (hareketsaatleri) API tarafında 404 Not Found dönmektedir ve deprecated kabul edilmektedir.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return await self._client.get(
             f"sefersaatleri/{kalkis_istasyon_id}/{varis_istasyon_id}"
         )
