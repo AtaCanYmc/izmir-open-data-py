@@ -104,9 +104,9 @@ Proje kod kalitesini sağlamak için `ruff`, `mypy` ve `pre-commit` kullanmaktad
 
 ```bash
 # Canlı veritabanına bağlanıp 150 endpointin anlık durumunu test edin
-pytest tests/test_live_endpoints.py -v
+pytest tests/
 ```
 
 ## 📄 Lisans
 
-Bu proje MIT Lisansı ile lisanslanmıştır. Kullanılan veriler İzmir Büyükşehir Belediyesi [Açık Veri Portalı](https://acikveri.bizizmir.com/) ve [Açık Kaynak Kodlu API](https://openapi.izmir.bel.tr/) üzerinden sağlanmaktadır.
+Bu proje **Apache License 2.0** altında lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına bakabilirsiniz.
