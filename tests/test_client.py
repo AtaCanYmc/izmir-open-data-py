@@ -1,4 +1,5 @@
 import pytest
+
 from izmir_open_data.core.client import IzmirClient
 
 

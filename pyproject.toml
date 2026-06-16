@@ -49,6 +49,9 @@ target-version = "py311"
 select = ["E", "F", "I", "UP"]
 ignore = ["E501"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["izmir_open_data"]
+
 [tool.mypy]
 ignore_missing_imports = true
 disable_error_code = ["no-any-return", "return-value", "no-untyped-def", "no-untyped-call", "operator", "index", "attr-defined", "misc", "type-arg"]

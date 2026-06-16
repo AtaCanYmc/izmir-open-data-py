@@ -2,6 +2,7 @@ import inspect
 from datetime import date
 
 import pytest
+
 from izmir_open_data.core.client import IzmirClient
 from izmir_open_data.endpoints.base import BaseEndpoint
 

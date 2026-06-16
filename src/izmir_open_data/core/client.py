@@ -3,6 +3,7 @@ import io
 from typing import Any
 
 import httpx
+
 from izmir_open_data.core.exceptions import APIError
 from izmir_open_data.endpoints.afetler import AfetlerEndpoint
 from izmir_open_data.endpoints.bisim import BisimEndpoint
