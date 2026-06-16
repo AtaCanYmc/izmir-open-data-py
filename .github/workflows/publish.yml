@@ -1,0 +1,40 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    name: Build and publish Python package
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # IMPORTANT: This is required for PyPI Trusted Publishing (OIDC)
+      contents: read   # Required for actions/checkout
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install build dependencies
+        run: python -m pip install --upgrade pip build
+
+      - name: Build a binary wheel and a source tarball
+        run: python -m build
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # This action uses OIDC by default (no password/token needed if configured in PyPI)
+          # To use this, you must go to PyPI -> Account settings -> Publishing -> Add a new pending publisher
+          # and set the repository to AtaCanYmc/izmir-open-data-py
+          skip-existing: true

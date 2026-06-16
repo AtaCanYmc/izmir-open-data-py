@@ -15,10 +15,32 @@ echo
 echo "-----------------------------------"
 echo
 
-# 2. Belirli bir verisetini çek (örn: hal-fiyatlari)
-# CLI, çıktıyı formatlı JSON olarak terminale basacaktır.
-echo "[2] 'hal-fiyatlari' veriseti çekiliyor:"
-izmir-data get hal-fiyatlari
+# 2. Afet Acil Toplanma Alanları
+echo "[2] 'cbs/afetaciltoplanmaalani' veriseti çekiliyor:"
+izmir-data get cbs/afetaciltoplanmaalani | head -n 20
+echo "..."
+echo
 
-# İPUCU: Çıktıyı işlemek için 'jq' gibi araçlarla birlikte kullanabilirsiniz:
-# izmir-data get hal-fiyatlari | jq '.kayitlar[0]'
+# 3. İzmir'deki Plajlar
+echo "[3] 'cbs/plajlar' veriseti çekiliyor:"
+izmir-data get cbs/plajlar | head -n 20
+echo "..."
+echo
+
+# 4. Hastaneler
+echo "[4] 'cbs/hastaneler' veriseti çekiliyor:"
+izmir-data get cbs/hastaneler | head -n 20
+echo "..."
+echo
+
+# 5. Kütüphaneler
+echo "[5] 'cbs/kutuphaneler' veriseti çekiliyor:"
+izmir-data get cbs/kutuphaneler | head -n 20
+echo "..."
+echo
+
+# 6. Bankalar
+echo "[6] 'cbs/bankalar' veriseti çekiliyor:"
+izmir-data get cbs/bankalar | head -n 20
+echo "..."
+echo
