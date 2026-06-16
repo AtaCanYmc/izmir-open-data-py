@@ -94,7 +94,9 @@ Proje entegre bir MCP sunucusuyla gelmektedir. Yapay zeka ajanlarına izmir veri
 izmir-mcp dev
 ```
 
-Daha fazla kullanım detayı için `examples/mcp_example.py` dosyasına göz atabilirsiniz.
+Yapay zeka asistanları (Örn. Claude), bu sunucuya bağlandıklarında sistemdeki tüm API'leri kendi başlarına tarayabilir ve sorularınızı gerçek zamanlı verilerle cevaplayabilir.
+
+> MCP sunucusunun yetenekleri, LLM araçları ve Claude Desktop entegrasyonu için detaylı [MCP Dokümantasyonuna (docs/MCP.md)](docs/MCP.md) göz atın.
 
 ## 🧪 Testler ve Geliştirme
 
