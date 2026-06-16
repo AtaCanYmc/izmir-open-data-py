@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 T = TypeVar("T")
 
@@ -26,6 +26,10 @@ class DefaultOnemliYer(BaseModel):
 class OnemliYerWrapper(BaseModel, Generic[T]):
     kayit_sayisi: int = Field(alias="kayit_sayisi")
     sayfa_numarasi: int = Field(alias="sayfa_numarasi")
-    sayfa_basina_kayit_sayisi: int = Field(alias="sayfa_basina_kayit_sayisi")
+    sayfa_basina_kayit_sayisi: int = Field(
+        validation_alias=AliasChoices(
+            "sayfa_basina_kayit_sayisi", "sayfadaki_kayitsayisi"
+        )
+    )
     toplam_sayfa_sayisi: int = Field(alias="toplam_sayfa_sayisi")
-    kayitlar: list[T] = Field(alias="kayitlar")
+    kayitlar: list[T] = Field(validation_alias=AliasChoices("kayitlar", "onemliyer"))
