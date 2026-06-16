@@ -1,8 +1,9 @@
 from fastmcp import FastMCP
-from .client import IzmirClient
+from src.izmir_open_data.scraper import IzmirClient
 
 # Initialize FastMCP server
 mcp = FastMCP("izmir-open-data", description="Izmir Open Data MCP Server")
+
 
 @mcp.tool()
 async def get_dataset(dataset_id: str) -> dict:
@@ -16,9 +17,11 @@ async def get_dataset(dataset_id: str) -> dict:
         data = await client.get_dataset(dataset_id)
         return data
 
+
 def main() -> None:
     """Run the MCP server."""
     mcp.run()
+
 
 if __name__ == "__main__":
     main()

@@ -42,7 +42,7 @@ izmir-data get hal-fiyatlari
 ### Kütüphane Olarak
 ```python
 import asyncio
-from izmir_open_data.client import IzmirClient
+from izmir_open_data.scraper import IzmirClient
 
 async def main():
     async with IzmirClient() as client:

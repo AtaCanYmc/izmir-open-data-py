@@ -2,9 +2,10 @@ import httpx
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
 
+
 class IzmirClient:
     """Async client for Izmir Open Data API."""
-    
+
     BASE_URL = "https://openapi.izmir.bel.tr/api"
 
     def __init__(self, api_key: Optional[str] = None):

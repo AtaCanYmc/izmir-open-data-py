@@ -26,7 +26,7 @@ dev = [
 
 [project.scripts]
 izmir-data = "izmir_open_data.cli:app"
-izmir-mcp = "izmir_open_data.mcp_server:main"
+izmir-mcp = "izmir_open_data.mcp:main"
 
 [build-system]
 requires = ["hatchling"]
