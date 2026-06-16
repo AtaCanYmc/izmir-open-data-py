@@ -1,62 +1,110 @@
-# Izmir Open Data Python Client 🏙️
+<p align="center">
+  <img src="assets/logo.png" width="300" alt="Izmir Open Data Logo">
+</p>
 
-Izmir Büyükşehir Belediyesi Açık Veri Portalı için resmi olmayan Python kütüphanesi ve MCP (Model Context Protocol) sunucusu.
+<h1 align="center">İzmir Open Data · Python İstemcisi</h1>
 
-Bu kütüphane `izmir-open-data-js` projesinin Python karşılığıdır.
+<p align="center">
+  <i>İzmir Büyükşehir Belediyesi Açık Veri Portalı ve Open API servisleri için modern, asenkron ve tip güvenli (Pydantic) Python istemcisi.</i>
+</p>
 
-## Özellikler
-- 🚀 Modern, `async` tabanlı API istemcisi (`httpx`)
-- 💻 Kullanışlı Komut Satırı Arayüzü (CLI) (`typer`)
-- 🤖 Model Context Protocol (MCP) Desteği (`fastmcp`)
-- 🛡️ Tam statik tip desteği ve Pydantic modelleri
+<p align="center">
+  <a href="https://python.org">
+    <img src="https://img.shields.io/badge/Python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+">
+  </a>
+  <a href="https://pydantic.dev">
+    <img src="https://img.shields.io/badge/Pydantic-v2-e92063.svg?logo=pydantic&logoColor=white" alt="Pydantic v2">
+  </a>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
+  </a>
+  <a href="https://mypy.readthedocs.io/en/stable/">
+    <img src="https://img.shields.io/badge/mypy-checked-1f5082.svg" alt="Mypy checked">
+  </a>
+  <a href="https://modelcontextprotocol.io/">
+    <img src="https://img.shields.io/badge/MCP-Ready-success.svg?logo=server&logoColor=white" alt="MCP Ready">
+  </a>
+</p>
 
-## Hızlı Başlangıç (Quick Start)
+---
 
-Geliştirme ortamını kurmak için aşağıdaki adımları izleyin. Bu projede modern ve hızlı olduğu için `uv` kullanılması önerilir (alternatif olarak standart `pip` veya `poetry` de kullanabilirsiniz).
+## 🚀 Özellikler
+
+- **Tam Asenkron Destek:** `httpx` altyapısı ile non-blocking, yüksek performanslı istekler.
+- **%100 Tip Güvenliği:** API yanıtları Pydantic V2 modellerine dönüştürülür, IDE'lerde otomatik tamamlama (autocompletion) desteği sunar.
+- **Kapsamlı Kapsama Alanı:** ESHOT, İZBAN, Metro, Vapur, BİSİM, İZSU, Otopark, Etkinlikler, Hal Fiyatları ve daha birçok servisi kapsayan ~150 endpoint desteği.
+- **CLI (Komut Satırı) Aracı:** Terminal üzerinden doğrudan açık veriye erişebilme imkanı.
+- **Model Context Protocol (MCP):** AI ajanlarının (Claude, vb.) doğrudan açık veriyi sorgulayabilmesi için hazır bir MCP sunucusu.
+
+## 📦 Kurulum
+
+Şu anda paket kaynak koddan yüklenebilmektedir (ileride PyPI'a eklenebilir):
 
 ```bash
-# 1. Proje dizininde Git'i başlatın
-git init
+# Repoyu klonlayın
+git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
+cd izmir-open-data-py
 
-# 2. Python sanal ortamını (virtual environment) oluşturun ve aktifleştirin
-# uv kullanıyorsanız:
-uv venv
-source .venv/bin/activate
-
-# 3. Bağımlılıkları geliştirici araçlarıyla birlikte yükleyin
-uv pip install -e ".[dev]"
-# veya standart pip ile: pip install -e ".[dev]"
-
-# 4. Pre-commit hook'larını kurun
-# Bu adım, her commit öncesi kodun otomatik olarak lint (ruff) ve type-check (mypy) işleminden geçmesini sağlar.
-pre-commit install
+# pip ile (tercihen sanal ortamda) kurun
+pip install -e .
 ```
 
-## Kullanım
+## 📖 Temel Kullanım
 
-### CLI Olarak
-```bash
-izmir-data get hal-fiyatlari
-```
-
-### Kütüphane Olarak
 ```python
 import asyncio
-from src.izmir_open_data.core.client import IzmirClient
+from izmir_open_data import IzmirClient
 
 async def main():
     async with IzmirClient() as client:
-        data = await client.get_dataset("hal-fiyatlari")
-        print(data)
+        # BİSİM İstasyonları ve Boş Bisiklet Durumları
+        istasyonlar = await client.bisim.get_istasyon_list()
+        for ist = istasyonlar.kayitlar[:3]:
+            print(f"İstasyon: {ist.adi} | Boş Bisiklet: {ist.bos_bisiklet_sayisi}")
 
-asyncio.run(main())
+        # Otopark Doluluk Oranları
+        otoparklar = await client.otopark.get_list()
+        for oto in otoparklar[:3]:
+            print(f"Otopark: {oto.name} | Boş Yer: {oto.occupancy.total.free}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
-### MCP Sunucusu Olarak
+> Daha detaylı istemci mimarisi ve namespace yapıları için [İstemci (Client) Dokümantasyonuna (docs/CLIENT.md)](docs/CLIENT.md) göz atın.
+
+## 💻 CLI (Komut Satırı) Aracı
+
+Terminal üzerinden herhangi bir script yazmadan İzmir verilerine ulaşabilirsiniz.
+
 ```bash
-izmir-mcp
+# Yardım menüsü
+izmir-data --help
+
+# İstediğiniz veri setini çekmek (örn: afet toplanma alanları)
+izmir-data get cbs/afetaciltoplanmaalani
 ```
 
-## Lisans
+## 🤖 MCP (Model Context Protocol) Sunucusu
 
-Bu proje [Apache License 2.0](LICENSE) altında lisanslanmıştır.
+Proje entegre bir MCP sunucusuyla gelmektedir. Yapay zeka ajanlarına izmir verilerini öğretmek isterseniz:
+
+```bash
+# FastMCP sunucusunu başlatın
+izmir-mcp dev
+```
+
+Daha fazla kullanım detayı için `examples/mcp_example.py` dosyasına göz atabilirsiniz.
+
+## 🧪 Testler ve Geliştirme
+
+Proje kod kalitesini sağlamak için `ruff`, `mypy` ve `pre-commit` kullanmaktadır. Canlı endpoint testleri `pytest` ile yazılmıştır:
+
+```bash
+# Canlı veritabanına bağlanıp 150 endpointin anlık durumunu test edin
+pytest tests/test_live_endpoints.py -v
+```
+
+## 📄 Lisans
+
+Bu proje MIT Lisansı ile lisanslanmıştır. Kullanılan veriler İzmir Büyükşehir Belediyesi [Açık Veri Portalı](https://acikveri.bizizmir.com/) ve [Açık Kaynak Kodlu API](https://openapi.izmir.bel.tr/) üzerinden sağlanmaktadır.

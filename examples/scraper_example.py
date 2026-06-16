@@ -14,7 +14,7 @@ async def main():
     # İstemciyi başlatın (Bazı verisetleri API anahtarı gerektirmeyebilir)
     # Async context manager (async with) kullanımı bağlantıların düzgün kapanmasını sağlar.
     async with IzmirClient() as client:
-        print("'afet_toplanma_alanlari' veriseti çekiliyor...")
+        print("İzmir Açık Veri API'sine bağlanılıyor...")
         data = await client.eczaneler.get_list()
 
         print("\nVeri başarıyla çekildi!")
