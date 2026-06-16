@@ -32,7 +32,7 @@
 
 - **Tam Asenkron Destek:** `httpx` altyapısı ile non-blocking, yüksek performanslı istekler.
 - **%100 Tip Güvenliği:** API yanıtları Pydantic V2 modellerine dönüştürülür, IDE'lerde otomatik tamamlama (autocompletion) desteği sunar.
-- **Kapsamlı Kapsama Alanı:** ESHOT, İZBAN, Metro, Vapur, BİSİM, İZSU, Otopark, Etkinlikler, Hal Fiyatları ve daha birçok servisi kapsayan ~150 endpoint desteği.
+- **Kapsamlı Kapsama Alanı:** ESHOT, İZBAN, Metro, Vapur, BİSİM, İZSU, Otopark, Etkinlikler, Hal Fiyatları ve daha birçok servisi kapsayan ~150 endpoint desteği. *(Bütün metodların listesini [Tüm Endpointler Listesi (docs/ENDPOINTS.md)](docs/ENDPOINTS.md) dosyasından inceleyebilirsiniz.)*
 - **CLI (Komut Satırı) Aracı:** Terminal üzerinden doğrudan açık veriye erişebilme imkanı.
 - **Model Context Protocol (MCP):** AI ajanlarının (Claude, vb.) doğrudan açık veriyi sorgulayabilmesi için hazır bir MCP sunucusu.
 
