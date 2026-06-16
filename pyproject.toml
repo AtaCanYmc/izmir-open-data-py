@@ -1,0 +1,44 @@
+[project]
+name = "izmir-open-data-py"
+version = "0.1.0"
+description = "Izmir Open Data API Client and MCP Server"
+readme = "README.md"
+authors = [
+    { name = "Ata Can", email = "ata.can@example.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.7.0",
+    "typer>=0.12.0",
+    "fastmcp>=0.1.0",
+    "rich>=13.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pre-commit>=3.7.0",
+    "ruff>=0.4.8",
+    "mypy>=1.10.0"
+]
+
+[project.scripts]
+izmir-data = "izmir_open_data.cli:app"
+izmir-mcp = "izmir_open_data.mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
