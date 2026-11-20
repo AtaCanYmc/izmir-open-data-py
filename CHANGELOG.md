@@ -2,6 +2,13 @@
 
 Bu projedeki tüm önemli değişiklikler bu belgede kayıt altına alınır. Format [Keep a Changelog](https://keepachangelog.com/tr/1.0.0/) standardına uygundur.
 
+## [0.3.1](https://github.com/AtaCanYmc/izmir-open-data-py/compare/v0.3.0...v0.3.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* **core:** export stream_records and stream alias in core init ([4aa54db](https://github.com/AtaCanYmc/izmir-open-data-py/commit/4aa54dbf7c1bf12e73a938880b37c161f45e4410))
+
 ## [0.3.0] - 2026-11-20
 
 ### Eklendi
