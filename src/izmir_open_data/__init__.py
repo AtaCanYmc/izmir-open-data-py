@@ -1,6 +1,6 @@
 """Izmir Open Data Python Client."""
 
-__version__ = "0.3.0"  # x-release-please-version
+__version__ = "0.3.1"  # x-release-please-version
 
 from .core.cache import CacheProvider, MemoryCache
 from .core.client import IzmirClient

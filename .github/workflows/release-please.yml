@@ -47,6 +47,7 @@ jobs:
         run: |
           python -m build
 
-      # PyPI Trusted Publishing can be enabled in repository settings
-      # - name: Publish package distributions to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true

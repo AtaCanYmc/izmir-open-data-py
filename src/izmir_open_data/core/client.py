@@ -72,7 +72,7 @@ class IzmirClient:
         else:
             self._cache = None
 
-        headers = {"User-Agent": "izmir-open-data-py/0.3.0"}  # x-release-please-version
+        headers = {"User-Agent": "izmir-open-data-py/0.3.1"}  # x-release-please-version
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
 
