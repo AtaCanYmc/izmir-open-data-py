@@ -7,6 +7,8 @@
 
 İzmir Büyükşehir Belediyesi Açık Veri Portalı API servisleri için geliştirilmiş modern, asenkron Python istemci kütüphanesi, terminal CLI aracı ve Model Context Protocol (FastMCP) sunucusu.
 
+[![PyPI](https://img.shields.io/pypi/v/izmir-open-data-py.svg?color=blue)](https://pypi.org/project/izmir-open-data-py/)
+[![Homebrew](https://img.shields.io/badge/Homebrew-izmir--data-orange.svg)](https://github.com/AtaCanYmc/homebrew-tap)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![Pydantic](https://img.shields.io/badge/Pydantic-v2-e92063.svg)](https://pydantic.dev)
@@ -81,19 +83,47 @@ flowchart TD
 
 ## Kurulum
 
-Projeyi doğrudan klonlayıp ortamınıza kurabilirsiniz:
+### 1. Homebrew ile Kurulum (macOS / Linux CLI)
+
+Resmi `AtaCanYmc/tap` üzerinden doğrudan izole terminal aracı olarak kurabilirsiniz:
+
+```bash
+# Tap ekleyip kurma
+brew tap AtaCanYmc/tap
+brew install izmir-data
+
+# Veya doğrudan tek komutla:
+brew install AtaCanYmc/tap/izmir-data
+```
+
+Kurulum tamamlandığında hem `izmir-data` hem de `izmir-mcp` komutları terminalinizde kullanıma hazır olur.
+
+### 2. PyPI (pip / uv) ile Kütüphane Kurulumu
+
+```bash
+# Standart kütüphane kurulumu
+pip install izmir-open-data-py
+
+# uv ile projeye ekleme
+uv add izmir-open-data-py
+
+# Veri bilimi eklentileri (pandas, polars, pyarrow) ile kurulum
+pip install "izmir-open-data-py[data]"
+```
+
+### 3. uvx ile Kurulumsuz Çalıştırma
+
+```bash
+uvx --from izmir-open-data-py izmir-data get nobetcieczaneler
+```
+
+### 4. Kaynak Koddan Geliştirici Kurulumu
 
 ```bash
 git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
 cd izmir-open-data-py
 
-# Standart kurulum
-uv pip install -e .
-
-# Veri bilimi kütüphaneleri (pandas, polars, pyarrow) ile kurulum
-uv pip install -e ".[data]"
-
-# Geliştirme ve test araçlarıyla kurulum
+# Geliştirme ortamı ve test araçlarıyla
 uv pip install -e ".[dev]"
 ```
 

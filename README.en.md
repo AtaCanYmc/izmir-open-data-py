@@ -7,6 +7,8 @@
 
 Modern, asynchronous Python client library, terminal CLI utility, and Model Context Protocol (FastMCP) server for the Izmir Metropolitan Municipality Open Data Portal API services.
 
+[![PyPI](https://img.shields.io/pypi/v/izmir-open-data-py.svg?color=blue)](https://pypi.org/project/izmir-open-data-py/)
+[![Homebrew](https://img.shields.io/badge/Homebrew-izmir--data-orange.svg)](https://github.com/AtaCanYmc/homebrew-tap)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![Pydantic](https://img.shields.io/badge/Pydantic-v2-e92063.svg)](https://pydantic.dev)
@@ -81,19 +83,47 @@ flowchart TD
 
 ## Installation
 
-Install the package directly into your virtual environment:
+### 1. Via Homebrew (macOS / Linux CLI)
+
+Install the isolated CLI binaries directly from the official `AtaCanYmc/tap`:
+
+```bash
+# Tap and install
+brew tap AtaCanYmc/tap
+brew install izmir-data
+
+# Or install directly in one command:
+brew install AtaCanYmc/tap/izmir-data
+```
+
+Both `izmir-data` and `izmir-mcp` executables will be available in your PATH.
+
+### 2. Via PyPI (pip / uv)
+
+```bash
+# Standard library installation
+pip install izmir-open-data-py
+
+# With uv
+uv add izmir-open-data-py
+
+# With data science extras (pandas, polars, pyarrow)
+pip install "izmir-open-data-py[data]"
+```
+
+### 3. Run Without Installation (uvx)
+
+```bash
+uvx --from izmir-open-data-py izmir-data get nobetcieczaneler
+```
+
+### 4. Developer Setup from Source
 
 ```bash
 git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
 cd izmir-open-data-py
 
-# Standard installation
-uv pip install -e .
-
-# With data science extras (pandas, polars, pyarrow)
-uv pip install -e ".[data]"
-
-# For development and test tooling
+# Development environment and testing tools
 uv pip install -e ".[dev]"
 ```
 
