@@ -148,8 +148,23 @@
 
       <div class="doc-section">
         <h2>Kurulum ve Paket Yöneticileri</h2>
-        
-        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.125rem;">1. uvx / pipx ile Anında Çalıştırma (Kurulumsuz)</h3>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.125rem;">1. Homebrew ile Kurulum (macOS / Linux - Önerilen CLI)</h3>
+        <p class="text-secondary">İzole ortamda resmi tap üzerinden CLI ve MCP araçlarını kurmak için:</p>
+
+        <div class="doc-code-block">
+          <div class="doc-code-header">
+            <span>bash</span>
+            <button type="button" class="copy-btn" data-copy="brew install AtaCanYmc/tap/izmir-data" aria-label="Komutu kopyala">Kopyala</button>
+          </div>
+          <div class="doc-code-content"># AtaCanYmc/tap üzerinden tek komutla kurulum
+brew install AtaCanYmc/tap/izmir-data
+
+# Alternatif olarak tap ekleyip kurma:
+# brew tap AtaCanYmc/tap && brew install izmir-data</div>
+        </div>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 0.5rem; font-size: 1.125rem;">2. uvx / pipx ile Anında Çalıştırma (Kurulumsuz)</h3>
         <p class="text-secondary">Sisteminizde Python ortamı kirletmeden tek komutla çalıştırma:</p>
         
         <div class="doc-code-block">
@@ -164,7 +179,7 @@ uvx --from izmir-open-data-py izmir-data get nobetcieczaneler
 pipx run --spec izmir-open-data-py izmir-data get cbs/bisimistasyon</div>
         </div>
 
-        <h3 style="margin-top: 2rem; margin-bottom: 0.5rem; font-size: 1.125rem;">2. pip / uv ile Global veya Sanal Ortam Kurulumu</h3>
+        <h3 style="margin-top: 2rem; margin-bottom: 0.5rem; font-size: 1.125rem;">3. pip / uv ile Global veya Sanal Ortam Kurulumu</h3>
         <div class="doc-code-block">
           <div class="doc-code-header">
             <span>bash</span>
@@ -343,6 +358,7 @@ izmir-data get nobetcieczaneler | grep -i "Konak"
           <div class="footer-heading">Topluluk & Dağıtım</div>
           <ul class="footer-links">
             <li><a href="https://github.com/AtaCanYmc/izmir-open-data-py" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub Deposu</a></li>
+            <li><a href="https://github.com/AtaCanYmc/homebrew-tap" class="footer-link" target="_blank" rel="noopener noreferrer">Homebrew Tap</a></li>
             <li><a href="https://pypi.org/project/izmir-open-data-py/" class="footer-link" target="_blank" rel="noopener noreferrer">PyPI Paketi</a></li>
             <li><a href="https://acikveri.bizizmir.com/" class="footer-link" target="_blank" rel="noopener noreferrer">İzmir Açık Veri Portalı</a></li>
           </ul>

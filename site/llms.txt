@@ -7,6 +7,7 @@
 - Lisans: Apache-2.0
 - GitHub: https://github.com/AtaCanYmc/izmir-open-data-py
 - Web Sitesi: https://atacanymc.github.io/izmir-open-data-py/
+- Homebrew Tap: https://github.com/AtaCanYmc/homebrew-tap
 - API Uç Noktaları: https://atacanymc.github.io/izmir-open-data-py/ENDPOINTS.html
 - CLI Kılavuzu: https://atacanymc.github.io/izmir-open-data-py/CLI.html
 - MCP Sunucusu: https://atacanymc.github.io/izmir-open-data-py/MCP.html
@@ -14,7 +15,10 @@
 
 ## Kurulum
 ```bash
-# pip veya uv ile kurulum
+# Homebrew ile doğrudan terminal araçlarını kurma (macOS / Linux)
+brew install AtaCanYmc/tap/izmir-data
+
+# pip veya uv ile Python kütüphanesi kurulumu
 pip install izmir-open-data-py
 
 # İsteğe bağlı veri bilimi eklentileriyle (pandas, polars, pyarrow)

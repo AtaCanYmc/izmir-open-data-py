@@ -125,9 +125,17 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="container">
-        <div class="hero-badge-wrap">
-          <span class="hero-badge-dot"></span>
-          <span>v0.3.0 Yayında · Veri Bilimi, Akışlar & FastMCP</span>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+          <div class="hero-badge-wrap" style="margin-bottom: 0;">
+            <span class="hero-badge-dot"></span>
+            <span>v0.3.0 Yayında · Veri Bilimi, Akışlar & FastMCP</span>
+          </div>
+          <a href="https://github.com/AtaCanYmc/homebrew-tap" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center;" title="Homebrew Formula: AtaCanYmc/tap/izmir-data">
+            <img src="https://img.shields.io/badge/Homebrew-izmir--data-orange.svg" alt="Homebrew" height="24">
+          </a>
+          <a href="https://pypi.org/project/izmir-open-data-py/" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center;" title="PyPI: izmir-open-data-py">
+            <img src="https://img.shields.io/pypi/v/izmir-open-data-py.svg?color=blue" alt="PyPI" height="24">
+          </a>
         </div>
 
         <h1 class="hero-title">
@@ -141,6 +149,7 @@
         <!-- Install Box Component -->
         <div class="install-box">
           <div class="install-tabs" role="tablist" aria-label="Paket yöneticisi seçimi">
+            <button type="button" class="install-tab-btn" data-pm="brew" role="tab" aria-selected="false">brew</button>
             <button type="button" class="install-tab-btn" data-pm="pip" role="tab" aria-selected="true">pip</button>
             <button type="button" class="install-tab-btn" data-pm="uv" role="tab" aria-selected="false">uv</button>
             <button type="button" class="install-tab-btn" data-pm="poetry" role="tab" aria-selected="false">poetry</button>
@@ -468,7 +477,7 @@
           <div class="section-tag">Terminal Arayüzü</div>
           <h2 class="section-title">İzmir Verisi Doğrudan Terminalinizde</h2>
           <p class="section-desc" style="margin-inline: auto;">
-            <code>izmir-data</code> CLI aracı ile verileri ASCII tablolarında sorgulayın, JSON çıktısı alın veya boru hatlarına bağlayın.
+            <code>izmir-data</code> CLI aracı ile verileri ASCII tablolarında sorgulayın, JSON çıktısı alın veya boru hatlarına bağlayın. Homebrew (<code>brew install AtaCanYmc/tap/izmir-data</code>) veya <code>uvx</code> ile sisteminizi kirletmeden kullanın.
           </p>
         </div>
 
@@ -566,6 +575,7 @@ Not: Terminale sığması için 4 sütun gösterildi.</pre>
           <div class="footer-heading">Topluluk & Dağıtım</div>
           <ul class="footer-links">
             <li><a href="https://github.com/AtaCanYmc/izmir-open-data-py" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub Deposu</a></li>
+            <li><a href="https://github.com/AtaCanYmc/homebrew-tap" class="footer-link" target="_blank" rel="noopener noreferrer">Homebrew Tap</a></li>
             <li><a href="https://pypi.org/project/izmir-open-data-py/" class="footer-link" target="_blank" rel="noopener noreferrer">PyPI Paketi</a></li>
             <li><a href="https://acikveri.bizizmir.com/" class="footer-link" target="_blank" rel="noopener noreferrer">İzmir Açık Veri Portalı</a></li>
           </ul>

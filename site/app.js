@@ -281,6 +281,7 @@ asyncio.run(main())`,
 // 2. Install Bar Tabs
 // ============================================================================
 const INSTALL_COMMANDS = {
+  brew: "brew install AtaCanYmc/tap/izmir-data",
   pip: "pip install izmir-open-data-py",
   uv: "uv add izmir-open-data-py",
   poetry: "poetry add izmir-open-data-py",
