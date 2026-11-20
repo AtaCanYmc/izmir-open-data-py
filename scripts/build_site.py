@@ -6,6 +6,7 @@ Converts markdown docs into interactive, responsive HTML pages with anti-slop pr
 
 from __future__ import annotations
 
+import html
 import json
 import re
 from pathlib import Path
@@ -358,21 +359,25 @@ def build_endpoints_html() -> None:
 
         rows_html = []
         for m in methods:
-            row_search = f"{m['name'].lower()} {m['desc'].lower()}"
+            row_search = html.escape(
+                f"{m['name'].lower()} {m['desc'].lower()}", quote=True
+            )
             rows_html.append(
                 f"""                <tr class="endpoint-row" data-search="{row_search}">
-                  <td><code class="method-chip">{m["name"]}</code></td>
+                  <td><code class="method-chip">{html.escape(m["name"])}</code></td>
                   <td>{m["desc"]}</td>
                 </tr>"""
             )
 
         ns_badge = (
-            f'<span class="doc-card-badge">{s["namespace"]}</span>'
+            f'<span class="doc-card-badge">{html.escape(str(s["namespace"]))}</span>'
             if s["namespace"]
             else ""
         )
+        escaped_title = html.escape(str(s["title"]), quote=True).lower()
+        escaped_ns = html.escape(str(s["namespace"]), quote=True).lower()
         cards_html.append(
-            f"""      <section class="doc-card endpoint-module-card" data-category="{s["category"]}" data-title="{str(s["title"]).lower()}" data-namespace="{str(s["namespace"]).lower()}">
+            f"""      <section class="doc-card endpoint-module-card" data-category="{s["category"]}" data-title="{escaped_title}" data-namespace="{escaped_ns}">
         <div class="doc-card-header">
           <div class="doc-card-title">
             <div class="category-icon-wrap" style="width: 32px; height: 32px;">

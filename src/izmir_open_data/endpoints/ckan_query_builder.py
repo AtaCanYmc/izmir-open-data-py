@@ -1,4 +1,5 @@
 import math
+import re
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -50,7 +51,13 @@ class CKANQueryBuilder:
         return self
 
     def sort(self, field: str, direction: str = "asc") -> "CKANQueryBuilder":
-        self.sort_order = f"{field} {direction}"
+        clean_dir = direction.lower().strip()
+        if clean_dir not in ("asc", "desc"):
+            clean_dir = "asc"
+        clean_field = field.strip()
+        if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", clean_field):
+            raise ValueError(f"Geçersiz alan adı formatı: {field}")
+        self.sort_order = f"{clean_field} {clean_dir}"
         return self
 
     def fields(self, fields_list: list[str]) -> "CKANQueryBuilder":

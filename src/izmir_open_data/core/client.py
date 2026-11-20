@@ -132,8 +132,11 @@ class IzmirClient:
     async def get(self, path: str, response_model: Any = None) -> Any:
         """Standard API fetch with cache, retry, and path traversal protection."""
         normalized_path = path.lstrip("/")
-        if ".." in normalized_path or re.match(
-            r"^[a-zA-Z][a-zA-Z0-9+.-]*:", normalized_path
+        unquoted = urllib.parse.unquote(normalized_path)
+        if (
+            ".." in unquoted
+            or re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", unquoted)
+            or unquoted.startswith("//")
         ):
             raise ValueError(f"Geçersiz veya güvensiz istek yolu: {path}")
 
@@ -179,7 +182,12 @@ class IzmirClient:
     ) -> Any:
         """Fetch from CKAN API with cache, retry, and safety protections."""
         clean_action = action.lstrip("/")
-        if ".." in clean_action or re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", clean_action):
+        unquoted_action = urllib.parse.unquote(clean_action)
+        if (
+            ".." in unquoted_action
+            or re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", unquoted_action)
+            or unquoted_action.startswith("//")
+        ):
             raise ValueError(f"Geçersiz veya güvensiz CKAN aksiyonu: {action}")
 
         url = f"{self.ckan_base_url.rstrip('/')}/{clean_action}"
@@ -287,6 +295,12 @@ class IzmirClient:
 
     async def get_csv(self, url: str, delimiter: str = ";") -> list[dict[str, Any]]:
         """Fetch and parse CSV data with prototype/pollution protection."""
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            raise ValueError(
+                "CSV istekleri yalnızca HTTP veya HTTPS şemalarını destekler."
+            )
+
         cache_key = f"CSV:{url}"
 
         if self._cache:

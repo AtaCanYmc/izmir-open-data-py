@@ -3,6 +3,7 @@ import respx
 from httpx import Response
 
 from izmir_open_data import IzmirClient
+from izmir_open_data.mcp import call_endpoint, get_dataset
 
 
 @pytest.mark.asyncio
@@ -12,10 +13,28 @@ async def test_path_traversal_protection():
         await client.get("../../../etc/passwd")
 
     with pytest.raises(ValueError, match="Geçersiz veya güvensiz istek yolu"):
+        await client.get("%2e%2e/%2e%2e/etc/passwd")
+
+    with pytest.raises(ValueError, match="Geçersiz veya güvensiz istek yolu"):
         await client.get("https://malicious-server.com/api")
 
     with pytest.raises(ValueError, match="Geçersiz veya güvensiz CKAN aksiyonu"):
         await client.get_ckan("../../escape_action")
+
+    with pytest.raises(ValueError, match="Geçersiz veya güvensiz CKAN aksiyonu"):
+        await client.get_ckan("%2e%2e/escape_action")
+
+    await client.close()
+
+
+@pytest.mark.asyncio
+async def test_csv_scheme_protection():
+    client = IzmirClient()
+    with pytest.raises(ValueError, match="CSV istekleri yalnızca HTTP veya HTTPS"):
+        await client.get_csv("file:///etc/passwd")
+
+    with pytest.raises(ValueError, match="CSV istekleri yalnızca HTTP veya HTTPS"):
+        await client.get_csv("ftp://malicious.com/data.csv")
 
     await client.close()
 
@@ -53,3 +72,32 @@ async def test_csv_prototype_pollution_protection():
     assert "constructor" not in results[0]
     assert "prototype" not in results[0]
     await client.close()
+
+
+def test_ckan_query_builder_sort_sanitization():
+    client = IzmirClient()
+    query = client.ckan.query("test-id")
+    with pytest.raises(ValueError, match="Geçersiz alan adı formatı"):
+        query.sort("field; DROP TABLE students;--", "desc")
+
+    query.sort("_id", "DESC")
+    params = query.to_params()
+    assert params["sort"] == "_id desc"
+
+
+@pytest.mark.asyncio
+async def test_mcp_security_validations():
+    with pytest.raises(ValueError, match="Geçersiz veya güvensiz dataset_id formatı"):
+        await get_dataset("../../etc/passwd")
+
+    with pytest.raises(ValueError, match="Geçersiz veya güvensiz dataset_id formatı"):
+        await get_dataset("%2e%2e/passwd")
+
+    res = await call_endpoint("close", "anything")
+    assert "Unauthorized or invalid namespace" in res
+
+    res2 = await call_endpoint("cache", "get")
+    assert "Unauthorized or invalid namespace" in res2
+
+    res3 = await call_endpoint("nonexistent", "method")
+    assert "not found" in res3

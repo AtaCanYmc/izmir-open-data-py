@@ -1,4 +1,6 @@
 import inspect
+import re
+import urllib.parse
 from typing import Any
 
 from fastmcp import FastMCP
@@ -32,22 +34,24 @@ async def list_endpoints() -> list[str]:
     LLMs can use this to discover what data they can fetch.
     """
     endpoints = []
-    client = IzmirClient()
+    async with IzmirClient() as client:
+        for attr_name in sorted(dir(client)):
+            if attr_name.startswith("_") or attr_name in DISALLOWED_NAMESPACES:
+                continue
 
-    for attr_name in sorted(dir(client)):
-        if attr_name.startswith("_") or attr_name in DISALLOWED_NAMESPACES:
-            continue
-
-        attr_val = getattr(client, attr_name)
-        if hasattr(attr_val, "__class__") and "Endpoint" in attr_val.__class__.__name__:
-            for method_name in sorted(dir(attr_val)):
-                if method_name.startswith("_"):
-                    continue
-                method = getattr(attr_val, method_name)
-                if callable(method):
-                    doc = inspect.getdoc(method) or "No description available."
-                    short_doc = doc.strip().split("\n")[0]
-                    endpoints.append(f"{attr_name}.{method_name}: {short_doc}")
+            attr_val = getattr(client, attr_name)
+            if (
+                hasattr(attr_val, "__class__")
+                and "Endpoint" in attr_val.__class__.__name__
+            ):
+                for method_name in sorted(dir(attr_val)):
+                    if method_name.startswith("_"):
+                        continue
+                    method = getattr(attr_val, method_name)
+                    if callable(method):
+                        doc = inspect.getdoc(method) or "No description available."
+                        short_doc = doc.strip().split("\n")[0]
+                        endpoints.append(f"{attr_name}.{method_name}: {short_doc}")
 
     return endpoints
 
@@ -61,6 +65,10 @@ async def get_dataset(dataset_id: str) -> dict | list:
     Args:
         dataset_id: The ID of the dataset to fetch (e.g., 'cbs/hastaneler')
     """
+    unquoted = urllib.parse.unquote(dataset_id)
+    if ".." in unquoted or not re.match(r"^[a-zA-Z0-9_\-/]+$", dataset_id):
+        raise ValueError("Geçersiz veya güvensiz dataset_id formatı.")
+
     async with IzmirClient() as client:
         return await client.get(f"ibb/{dataset_id}")
 
@@ -90,6 +98,11 @@ async def call_endpoint(
             return f"Error: Namespace '{namespace}' not found."
 
         ns_obj = getattr(client, namespace)
+        if not (
+            hasattr(ns_obj, "__class__") and "Endpoint" in ns_obj.__class__.__name__
+        ):
+            return f"Error: '{namespace}' is not a valid API endpoint namespace."
+
         if not hasattr(ns_obj, endpoint_name) or endpoint_name.startswith("_"):
             return f"Error: Endpoint '{endpoint_name}' not found in namespace '{namespace}'."
 
