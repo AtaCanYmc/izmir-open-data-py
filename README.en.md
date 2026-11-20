@@ -26,6 +26,8 @@ Modern, asynchronous Python client library, terminal CLI utility, and Model Cont
   - [2. Terminal CLI Utility](#2-terminal-cli-utility)
   - [3. Model Context Protocol (MCP) Server](#3-model-context-protocol-mcp-server)
   - [4. Advanced Features (Cache, Retry, CKAN Query Builder, GeoJSON)](#4-advanced-features-cache-retry-ckan-query-builder-geojson)
+  - [5. Data Science Integrations (Pandas, Polars, Parquet, Streams)](#5-data-science-integrations-pandas-polars-parquet-streams)
+  - [6. Offline Testing Infrastructure (Mock Client)](#6-offline-testing-infrastructure-mock-client)
 - [Endpoint Namespaces](#endpoint-namespaces)
 - [Development and Testing](#development-and-testing)
 - [License](#license)
@@ -40,6 +42,7 @@ The library provides a unified asynchronous client layer for applications, termi
 flowchart TD
     subgraph Consumers["Client and Consumer Layer"]
         Apps["Python Applications (FastAPI, Django, Scripts)"]
+        DataScience["Data Science (Pandas, Polars, DuckDB)"]
         CLI["izmir-data (Terminal CLI)"]
         LLM["AI Agents / Claude Desktop (izmir-mcp)"]
     end
@@ -48,6 +51,7 @@ flowchart TD
         API["IzmirClient / IzmirAPI"]
         Cache["MemoryCache (TTL & FIFO)"]
         Retry["Retry Middleware (Jitter & Backoff)"]
+        DataExport["Export Engine (Parquet, GeoParquet, Stream)"]
         Modules["Service Namespaces (eshot, bisim, izsu, ckan, tuvalet, itfaiye)"]
     end
 
@@ -59,10 +63,12 @@ flowchart TD
     end
 
     Apps -->|"Import"| API
+    DataScience -->|"DataFrames & Parquet"| DataExport
     CLI -->|"Command Execution"| API
     LLM -->|"stdio JSON-RPC"| API
     API --> Cache
     API --> Retry
+    API --> DataExport
     API --> Modules
     Modules -->|"HTTPS GET"| OpenAPI
     Modules -->|"Datastore Queries"| CKAN
@@ -80,16 +86,13 @@ Install the package directly into your virtual environment:
 git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
 cd izmir-open-data-py
 
-# Install with pip
-pip install -e .
-
-# Or using uv
+# Standard installation
 uv pip install -e .
-```
 
-For development and test tooling:
+# With data science extras (pandas, polars, pyarrow)
+uv pip install -e ".[data]"
 
-```bash
+# For development and test tooling
 uv pip install -e ".[dev]"
 ```
 
@@ -243,6 +246,42 @@ geojson_data = to_geojson(parks)
 
 print(geojson_data["type"])  # "FeatureCollection"
 print(geojson_data["features"][0]["geometry"]["coordinates"])
+```
+
+### 5. Data Science Integrations (Pandas, Polars, Parquet, Streams)
+
+Direct export tools for analytical notebooks and machine learning pipelines:
+
+```python
+from izmir_open_data import to_dataframe, to_polars, to_parquet, to_geoparquet
+
+# 1. Convert to Pandas or Polars DataFrames
+df = await client.ckan.query("res-id").where("ILCE", "KONAK").to_dataframe()
+pldf = await client.ckan.query("res-id").where("ILCE", "KONAK").to_polars()
+
+# 2. Asynchronous generator streams (memory-efficient paging)
+async for item in client.ckan.query("res-id").stream(batch_size=200):
+    process(item)
+
+# 3. Store locally in compressed Parquet or GeoParquet (WKB Point) format
+await client.ckan.query("res-id").to_parquet("records.parquet")
+await client.ckan.query("res-id").to_geoparquet("spatial.geoparquet")
+```
+
+### 6. Offline Testing Infrastructure (Mock Client)
+
+Run test suites without internet access or in air-gapped CI environments:
+
+```python
+from izmir_open_data import MockIzmirClient, get_fixture
+
+# Access realistic pre-recorded fixtures
+eczaneler = get_fixture("eczaneler")
+
+# Mock client that performs no network calls
+client = MockIzmirClient()
+nobetci = await client.eczaneler.get_list()
+assert len(nobetci) > 0
 ```
 
 ---

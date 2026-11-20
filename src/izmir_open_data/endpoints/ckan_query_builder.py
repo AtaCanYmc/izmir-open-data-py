@@ -1,4 +1,6 @@
 import math
+from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -84,10 +86,23 @@ class CKANQueryBuilder:
         max_records: int | float = math.inf,
     ) -> list[dict[str, Any]]:
         all_records: list[dict[str, Any]] = []
-        current_offset = self.record_offset
+        async for batch in self.stream_batches(
+            batch_size=batch_size, max_records=max_records
+        ):
+            all_records.extend(batch)
+        return all_records
 
-        while len(all_records) < max_records:
-            current_limit = int(min(batch_size, max_records - len(all_records)))
+    async def stream_batches(
+        self,
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+    ) -> AsyncIterator[list[dict[str, Any]]]:
+        """Stream matching records batch by batch."""
+        current_offset = self.record_offset
+        total_retrieved = 0
+
+        while total_retrieved < max_records:
+            current_limit = int(min(batch_size, max_records - total_retrieved))
             clone = CKANQueryBuilder(self._client, self.resource_id)
             clone.field_filters = dict(self.field_filters)
             clone.search_filter = self.search_filter
@@ -103,11 +118,76 @@ class CKANQueryBuilder:
             if not records:
                 break
 
-            all_records.extend(records)
+            yield records
+            total_retrieved += len(records)
             current_offset += len(records)
             total = res.get("total", 0) if isinstance(res, dict) else 0
 
             if len(records) < current_limit or current_offset >= total:
                 break
 
-        return all_records
+    async def stream(
+        self,
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Stream matching records item by item asynchronously."""
+        async for batch in self.stream_batches(
+            batch_size=batch_size, max_records=max_records
+        ):
+            for record in batch:
+                yield record
+
+    async def to_dataframe(
+        self,
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+    ) -> Any:
+        """Fetch all records matching the query and return as a Pandas DataFrame."""
+        from izmir_open_data.core.dataframes import to_dataframe
+
+        records = await self.fetch_all(batch_size=batch_size, max_records=max_records)
+        return to_dataframe(records)
+
+    async def to_polars(
+        self,
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+    ) -> Any:
+        """Fetch all records matching the query and return as a Polars DataFrame."""
+        from izmir_open_data.core.dataframes import to_polars
+
+        records = await self.fetch_all(batch_size=batch_size, max_records=max_records)
+        return to_polars(records)
+
+    async def to_parquet(
+        self,
+        path: str | Path,
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+        compression: str = "snappy",
+    ) -> None:
+        """Fetch matching records and store as a Parquet file."""
+        from izmir_open_data.core.parquet import to_parquet
+
+        records = await self.fetch_all(batch_size=batch_size, max_records=max_records)
+        to_parquet(records, path=path, compression=compression)
+
+    async def to_geoparquet(
+        self,
+        path: str | Path,
+        geometry_column: str = "geometry",
+        batch_size: int = 1000,
+        max_records: int | float = math.inf,
+        compression: str = "snappy",
+    ) -> None:
+        """Fetch matching records and store as a GeoParquet (v1.1.0) file."""
+        from izmir_open_data.core.parquet import to_geoparquet
+
+        records = await self.fetch_all(batch_size=batch_size, max_records=max_records)
+        to_geoparquet(
+            records,
+            path=path,
+            geometry_column=geometry_column,
+            compression=compression,
+        )

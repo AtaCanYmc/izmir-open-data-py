@@ -2,6 +2,16 @@
 
 Bu projedeki tüm önemli değişiklikler bu belgede kayıt altına alınır. Format [Keep a Changelog](https://keepachangelog.com/tr/1.0.0/) standardına uygundur.
 
+## [0.3.0] - 2026-11-20
+
+### Eklendi
+- Pandas ve Polars DataFrame dışa aktarım desteği (`to_dataframe()`, `to_polars()`).
+- CKANQueryBuilder için doğrudan `.to_dataframe()` ve `.to_polars()` metodları.
+- Asenkron jeneratör akışları (`stream()`, `stream_batches()`, `stream_records()`) ile bellek tasarruflu büyük veri işleme.
+- Parquet ve GeoParquet v1.1.0 depolama araçları (`to_parquet()`, `read_parquet()`, `to_geoparquet()`).
+- Çevrimdışı test fikstürleri (`get_fixture()`, `FIXTURES`) ve ağsız test istemcisi (`MockIzmirClient`).
+- Google `release-please` yapılandırması ve GitHub Actions yayınlama iş akışı.
+
 ## [0.2.0] - 2026-11-20
 
 ### Eklendi

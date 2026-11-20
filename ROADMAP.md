@@ -21,9 +21,16 @@ Bu belge, `izmir-open-data-py` projesinin tamamlanan ve planlanan teknik kilomet
 - [x] **Gelişmiş CLI:** `izmir-data search` ve `izmir-data datastore` komutları.
 - [x] **Güvenlik Sertleştirmesi:** Path traversal ve SSRF koruması, CSV prototip/alan enjeksiyonu koruması, URL-encoding.
 
-## v0.3.0: Veri Bilimi Entegrasyonları ve Gelişmiş İstemci (Planlanan)
+## v0.3.0: Veri Bilimi Entegrasyonları ve Gelişmiş İstemci (Tamamlandı)
 
-- [ ] Polars ve Pandas DataFrame doğrudan dışa aktarım desteği (`to_dataframe()`, `to_polars()`).
-- [ ] Toplu API çağrıları için asenkron jeneratör akışları (async generator stream).
-- [ ] Çevrimdışı testler için dahili sahte veri seti üreticisi (offline test fixtures).
-- [ ] Parquet ve GeoParquet formatında yerel depolama araçları.
+- [x] **Polars & Pandas Desteği:** Tek satırda DataFrame dönüşümü (`to_dataframe()`, `to_polars()`).
+- [x] **Asenkron Jeneratör Akışları:** Bellek dostu sayfalama (`stream()`, `stream_batches()`, `stream_records()`).
+- [x] **Çevrimdışı Test Altyapısı:** Dahili test verileri (`get_fixture()`, `FIXTURES`) ve ağsız test istemcisi (`MockIzmirClient`).
+- [x] **Parquet & GeoParquet Depolama:** Sıkıştırılmış yerel depolama (`to_parquet()`, `read_parquet()`) ve WKB geometrili GeoParquet v1.1.0 dışa aktarımı (`to_geoparquet()`).
+- [x] **Otomatik Sürüm Yönetimi:** Google `release-please` iş akışı ve konfigürasyonu.
+
+## v0.4.0: Analitik Bağlayıcılar ve Görselleştirme (Planlanan)
+
+- [ ] DuckDB ve SQLite yerel veritabanı doğrudan bağlayıcıları (in-memory analytics).
+- [ ] FlatGeobuf ve PMTiles format dönüştürücüleri.
+- [ ] Harita görselleştirme yardımcıları (Folium, PyDeck entegrasyonu).

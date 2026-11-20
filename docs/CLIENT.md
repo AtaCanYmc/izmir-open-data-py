@@ -108,6 +108,69 @@ print(geojson_data["type"])  # "FeatureCollection"
 print(geojson_data["features"][0]["geometry"]["coordinates"])
 ```
 
+### 5. Pandas & Polars DataFrame Dışa Aktarımı
+
+Veri analitiği ve yapay zeka iş akışları için tek satırda DataFrame dönüşümü:
+
+```python
+from izmir_open_data import to_dataframe, to_polars
+
+# Herhangi bir API yanıtını Pandas veya Polars tablosuna çevirme
+eczane_listesi = await client.eczaneler.get_list()
+df = to_dataframe(eczane_listesi)
+pldf = to_polars(eczane_listesi)
+
+# CKAN Query Builder üzerinden doğrudan:
+df = await client.ckan.query("res-uuid").where("ILCE", "KONAK").to_dataframe()
+pldf = await client.ckan.query("res-uuid").where("ILCE", "KONAK").to_polars()
+```
+
+### 6. Asenkron Jeneratör Akışları (Streams)
+
+Büyük veri setlerini (10.000+ kayıt) belleği şişirmeden akış halinde işleme:
+
+```python
+# Kayıt bazlı akış (item by item)
+async for record in client.ckan.query("res-uuid").stream(batch_size=200):
+    print(record["_id"], record.get("TESIS_ADI"))
+
+# Paket bazlı akış (batch by batch)
+async for batch in client.ckan.query("res-uuid").stream_batches(batch_size=500):
+    print(f"Alınan paket boyutu: {len(batch)}")
+```
+
+### 7. Parquet ve GeoParquet Depolama Araçları
+
+Verileri sıkıştırılmış sütun tabanlı Parquet veya WKB geometrili GeoParquet v1.1.0 formatında saklama:
+
+```python
+from izmir_open_data import to_parquet, read_parquet, to_geoparquet
+
+# Parquet olarak kaydetme ve okuma
+await client.ckan.query("res-uuid").to_parquet("veriler.parquet")
+records = read_parquet("veriler.parquet")
+
+# CBS verilerini standart GeoParquet olarak dışa aktarma (QGIS / DuckDB uyumlu)
+parklar = await client.cografi.get_meydanlar_list()
+to_geoparquet(parklar, "meydanlar.geoparquet")
+```
+
+### 8. Çevrimdışı Test Altyapısı (Mock Client)
+
+Ağ erişimi gerektirmeden birim testleri koşturmak veya air-gapped ortamlarda çalışmak için:
+
+```python
+from izmir_open_data import MockIzmirClient, get_fixture
+
+# Hazır fikstür verisine erişim
+eczaneler = get_fixture("eczaneler")
+
+# Mock istemci ile ağ isteği atmadan geliştirme yapma
+client = MockIzmirClient()
+nobetci = await client.eczaneler.get_list()
+assert len(nobetci) > 0
+```
+
 ## Endpoint Grupları (Namespaces)
 
 - **Ulaşım:** `client.eshot`, `client.izban`, `client.metro`, `client.tramvay`, `client.vapur`, `client.taksi`, `client.izum`

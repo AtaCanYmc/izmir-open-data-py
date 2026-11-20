@@ -26,6 +26,8 @@
   - [2. Terminal CLI Aracı](#2-terminal-cli-aracı)
   - [3. Model Context Protocol (MCP) Sunucusu](#3-model-context-protocol-mcp-sunucusu)
   - [4. Gelişmiş Özellikler (Önbellek, Retry, CKAN Query Builder, GeoJSON)](#4-gelişmiş-özellikler-önbellek-retry-ckan-query-builder-geojson)
+  - [5. Veri Bilimi Entegrasyonları (Pandas, Polars, Parquet, Streams)](#5-veri-bilimi-entegrasyonları-pandas-polars-parquet-streams)
+  - [6. Çevrimdışı Test Altyapısı (Mock Client)](#6-çevrimdışı-test-altyapısı-mock-client)
 - [Uç Nokta ve Servis Modülleri](#uç-nokta-ve-servis-modülleri)
 - [Geliştirme ve Test](#geliştirme-ve-test)
 - [Lisans](#lisans)
@@ -40,6 +42,7 @@ Kütüphane; uygulama kodları, komut satırı kullanıcıları ve yapay zeka aj
 flowchart TD
     subgraph Consumers["İstemci ve Tüketici Katmanı"]
         Apps["Python Uygulamaları (FastAPI, Django, Scriptler)"]
+        DataScience["Veri Bilimi (Pandas, Polars, DuckDB)"]
         CLI["izmir-data (Terminal CLI)"]
         LLM["AI Ajanları / Claude Desktop (izmir-mcp)"]
     end
@@ -48,6 +51,7 @@ flowchart TD
         API["IzmirClient / IzmirAPI"]
         Cache["MemoryCache (TTL & FIFO)"]
         Retry["Retry Middleware (Jitter & Backoff)"]
+        DataExport["Dışa Aktarım (Parquet, GeoParquet, Stream)"]
         Modules["Servis Modülleri (eshot, bisim, izsu, ckan, tuvalet, itfaiye)"]
     end
 
@@ -59,10 +63,12 @@ flowchart TD
     end
 
     Apps -->|"Import"| API
+    DataScience -->|"DataFrames & Parquet"| DataExport
     CLI -->|"Komut Yürütme"| API
     LLM -->|"stdio JSON-RPC"| API
     API --> Cache
     API --> Retry
+    API --> DataExport
     API --> Modules
     Modules -->|"HTTPS GET"| OpenAPI
     Modules -->|"Datastore Sorguları"| CKAN
@@ -80,16 +86,13 @@ Projeyi doğrudan klonlayıp ortamınıza kurabilirsiniz:
 git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
 cd izmir-open-data-py
 
-# pip ile kurulum
-pip install -e .
-
-# veya uv ile
+# Standart kurulum
 uv pip install -e .
-```
 
-Geliştirme ve test bağımlılıklarıyla birlikte kurulum:
+# Veri bilimi kütüphaneleri (pandas, polars, pyarrow) ile kurulum
+uv pip install -e ".[data]"
 
-```bash
+# Geliştirme ve test araçlarıyla kurulum
 uv pip install -e ".[dev]"
 ```
 
@@ -243,6 +246,42 @@ geojson_data = to_geojson(parklar)
 
 print(geojson_data["type"])  # "FeatureCollection"
 print(geojson_data["features"][0]["geometry"]["coordinates"])
+```
+
+### 5. Veri Bilimi Entegrasyonları (Pandas, Polars, Parquet, Streams)
+
+Veri analitiği ve makine öğrenimi boru hatları için doğrudan dışa aktarım araçları:
+
+```python
+from izmir_open_data import to_dataframe, to_polars, to_parquet, to_geoparquet
+
+# 1. Pandas veya Polars DataFrame'e dönüştürme
+df = await client.ckan.query("res-id").where("ILCE", "KONAK").to_dataframe()
+pldf = await client.ckan.query("res-id").where("ILCE", "KONAK").to_polars()
+
+# 2. Asenkron jeneratör akışları (bellek dostu)
+async for item in client.ckan.query("res-id").stream(batch_size=200):
+    process(item)
+
+# 3. Sıkıştırılmış Parquet veya GeoParquet (WKB Point) olarak kaydetme
+await client.ckan.query("res-id").to_parquet("veriler.parquet")
+await client.ckan.query("res-id").to_geoparquet("mekansal_veriler.geoparquet")
+```
+
+### 6. Çevrimdışı Test Altyapısı (Mock Client)
+
+Ağ bağlantısı gerektirmeyen birim testleri koşturmak veya air-gapped ortamlarda çalışmak için dahili sahte veri seti altyapısı:
+
+```python
+from izmir_open_data import MockIzmirClient, get_fixture
+
+# Hazır test verilerine erişim
+eczaneler = get_fixture("eczaneler")
+
+# Mock istemci ile ağ isteği atmadan geliştirme yapma
+client = MockIzmirClient()
+nobetci = await client.eczaneler.get_list()
+assert len(nobetci) > 0
 ```
 
 ---
