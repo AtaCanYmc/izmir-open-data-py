@@ -1,6 +1,6 @@
 [project]
 name = "izmir-open-data-py"
-version = "0.3.0"
+version = "0.3.1"
 description = "Izmir Open Data API Client and MCP Server"
 readme = "README.md"
 authors = [
