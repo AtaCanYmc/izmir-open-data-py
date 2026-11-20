@@ -10,10 +10,11 @@ Modern, asynchronous Python client library, terminal CLI utility, and Model Cont
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![Pydantic](https://img.shields.io/badge/Pydantic-v2-e92063.svg)](https://pydantic.dev)
+[![Docs](https://img.shields.io/badge/docs-GitHub_Pages-blue.svg)](https://atacanymc.github.io/izmir-open-data-py/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![MCP](https://img.shields.io/badge/MCP-Ready-success.svg)](https://modelcontextprotocol.io/)
 
-[Türkçe](README.md) | [English](README.en.md)
+[Türkçe](README.md) | [English](README.en.md) | [Live Documentation Portal](https://atacanymc.github.io/izmir-open-data-py/)
 
 ---
 

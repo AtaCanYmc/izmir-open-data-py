@@ -1,0 +1,69 @@
+# İzmir Open Data Python (izmir-open-data-py)
+
+> İzmir Büyükşehir Belediyesi Açık Veri Portalı için modern, asenkron Python SDK, terminal CLI aracı, veri bilimi entegrasyonları (Pandas, Polars, Parquet) ve Model Context Protocol (MCP) sunucusu.
+
+## Genel Bakış
+- Paket: `izmir-open-data-py` (PyPI)
+- Lisans: Apache-2.0
+- GitHub: https://github.com/AtaCanYmc/izmir-open-data-py
+- Web Sitesi: https://atacanymc.github.io/izmir-open-data-py/
+- API Uç Noktaları: https://atacanymc.github.io/izmir-open-data-py/ENDPOINTS.html
+- CLI Kılavuzu: https://atacanymc.github.io/izmir-open-data-py/CLI.html
+- MCP Sunucusu: https://atacanymc.github.io/izmir-open-data-py/MCP.html
+- Resmi Şartnameler: https://atacanymc.github.io/izmir-open-data-py/specs/index.html
+
+## Kurulum
+```bash
+# pip veya uv ile kurulum
+pip install izmir-open-data-py
+
+# İsteğe bağlı veri bilimi eklentileriyle (pandas, polars, pyarrow)
+pip install "izmir-open-data-py[all]"
+```
+
+## Temel Kullanım (Python)
+```python
+import asyncio
+from izmir_open_data import IzmirClient, to_dataframe, to_polars
+
+async def main():
+    async with IzmirClient(cache=True) as client:
+        # Canlı ESHOT otobüs konumları
+        konumlar = await client.eshot.get_hat_otobus_konumlari(5)
+        print("Otobüsler:", len(konumlar))
+
+        # Nöbetçi eczaneler
+        eczaneler = await client.eczaneler.get_nobetci_list()
+        print("Eczaneler:", len(eczaneler))
+
+        # BİSİM istasyonları ve DataFrame dönüşümü
+        bisim = await client.bisim.get_istasyon_list()
+        df = to_dataframe(bisim)
+        print(df.head())
+
+        # CKAN Açık Veri Katalog Arama
+        sonuclar = await client.ckan.search_packages(q="otopark")
+        print(f"Bulunan paketler: {sonuclar.get('count', 0)}")
+
+asyncio.run(main())
+```
+
+## CLI Komutları
+- `izmir-data get cbs/bisimistasyon`: BİSİM istasyonlarını çeker ve ASCII tablolar
+- `izmir-data get otopark/otoparklar`: İZELMAN otopark doluluklarını listeler
+- `izmir-data search <query> [-l limit]`: CKAN açık veri katalog araması
+- `izmir-data datastore <resource_id> [-l limit]`: CKAN datastore canlı kayıtları
+
+## Model Context Protocol (MCP)
+LLM ajanları (Claude Desktop, Cursor, vb.) için MCP sunucusu:
+```json
+{
+  "mcpServers": {
+    "izmir-open-data": {
+      "command": "uvx",
+      "args": ["izmir-open-data-py"]
+    }
+  }
+}
+```
+Sağlanan araçlar: `list_endpoints`, `call_endpoint`, `get_dataset`.

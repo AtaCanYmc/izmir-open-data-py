@@ -1,0 +1,583 @@
+/**
+ * İzmir Open Data Python - Interactive Showcase Controller
+ * Architecture: Vanilla Modern JS, Web Platform APIs, Anti-AI-Slop
+ */
+
+// ============================================================================
+// 1. Data Definitions for Live Playground
+// ============================================================================
+const ENDPOINTS_DATA = {
+  eshot: {
+    name: "ESHOT Hat & Durak",
+    badge: "Ulaşım",
+    endpoint: "client.eshot.get_hatlar()",
+    pyCode: `import asyncio
+from izmir_open_data import IzmirClient
+
+async def main():
+    async with IzmirClient(cache=True) as client:
+        # ESHOT hat listesini sorgulama
+        hatlar = await client.eshot.get_hatlar()
+        print(f"Toplam aktif hat sayısı: {len(hatlar)}")
+
+        # Belirli bir hatta yaklaşan otobüs konumları
+        konumlar = await client.eshot.get_hat_otobus_konumlari(5)
+        print("Canlı Konumlar:", konumlar)
+
+asyncio.run(main())`,
+    jsonResult: [
+      {
+        HAT_NO: 5,
+        HAT_ADI: "NARLIDERE - KUYULAR İSKELE",
+        GUZERGAH_ACIKLAMA: "MİTHAT PAŞA CAD.",
+        HAT_BASLANGIC: "NARLIDERE",
+        HAT_BITIS: "KUYULAR İSKELE",
+        TARIFE: "Standart"
+      },
+      {
+        HAT_NO: 6,
+        HAT_ADI: "ARIKENT - KUYULAR İSKELE",
+        GUZERGAH_ACIKLAMA: "MİTHAT PAŞA CAD.",
+        HAT_BASLANGIC: "ARIKENT",
+        HAT_BITIS: "KUYULAR İSKELE",
+        TARIFE: "Standart"
+      },
+      {
+        HAT_NO: 10,
+        HAT_ADI: "FAHRETTİN ALTAY - KONAK",
+        GUZERGAH_ACIKLAMA: "İNÖNÜ CAD.",
+        HAT_BASLANGIC: "FAHRETTİN ALTAY",
+        HAT_BITIS: "KONAK",
+        TARIFE: "Standart"
+      }
+    ],
+    tableHeaders: ["HAT_NO", "HAT_ADI", "HAT_BASLANGIC", "HAT_BITIS"],
+    tableRows: [
+      ["5", "NARLIDERE - KUYULAR İSKELE", "NARLIDERE", "KUYULAR İSKELE"],
+      ["6", "ARIKENT - KUYULAR İSKELE", "ARIKENT", "KUYULAR İSKELE"],
+      ["10", "FAHRETTİN ALTAY - KONAK", "FAHRETTİN ALTAY", "KONAK"]
+    ]
+  },
+
+  bisim: {
+    name: "BİSİM İstasyonları",
+    badge: "Mikro Mobilite",
+    endpoint: "client.bisim.get_istasyon_list()",
+    pyCode: `import asyncio
+from izmir_open_data import IzmirClient, to_geojson
+
+async def main():
+    async with IzmirClient(cache=True) as client:
+        # BİSİM istasyon doluluk ve kapasite bilgileri
+        istasyonlar = await client.bisim.get_istasyon_list()
+
+        # CBS verisini doğrudan standart RFC 7946 GeoJSON formatına dönüştürme
+        geojson = to_geojson(istasyonlar)
+        print("FeatureCollection:", len(geojson["features"]))
+
+asyncio.run(main())`,
+    jsonResult: [
+      {
+        IstasyonId: 101,
+        Adi: "Konak İskele",
+        Kapasite: 30,
+        BosKapasite: 12,
+        BisikletSayisi: 18,
+        BOYLAM: 27.1287,
+        ENLEM: 38.4189,
+        Durum: "Aktif"
+      },
+      {
+        IstasyonId: 102,
+        Adi: "Alsancak Liman",
+        Kapasite: 24,
+        BosKapasite: 8,
+        BisikletSayisi: 16,
+        BOYLAM: 27.1442,
+        ENLEM: 38.4412,
+        Durum: "Aktif"
+      },
+      {
+        IstasyonId: 103,
+        Adi: "Karşıyaka Vapur İskelesi",
+        Kapasite: 36,
+        BosKapasite: 15,
+        BisikletSayisi: 21,
+        BOYLAM: 27.1198,
+        ENLEM: 38.4561,
+        Durum: "Aktif"
+      }
+    ],
+    tableHeaders: ["Adi", "Kapasite", "BisikletSayisi", "Durum"],
+    tableRows: [
+      ["Konak İskele", "30", "18", "Aktif"],
+      ["Alsancak Liman", "24", "16", "Aktif"],
+      ["Karşıyaka Vapur İskelesi", "36", "21", "Aktif"]
+    ]
+  },
+
+  eczaneler: {
+    name: "Nöbetçi Eczaneler",
+    badge: "Sağlık",
+    endpoint: "client.eczaneler.get_nobetci_list()",
+    pyCode: `import asyncio
+from izmir_open_data import IzmirClient, extract_coordinates
+
+async def main():
+    async with IzmirClient(cache=True) as client:
+        # İzmir genelinde aktif nöbetçi eczaneler
+        eczaneler = await client.eczaneler.get_nobetci_list()
+
+        for e in eczaneler:
+            # Yazılım Şube LokasyonX/Y koordinatını [lon, lat] çiftine çevir
+            coords = extract_coordinates(e)
+            print(f"{e.get('Adi')} ({e.get('Bolge')}): {coords}")
+
+asyncio.run(main())`,
+    jsonResult: [
+      {
+        EczaneId: 442,
+        Adi: "Alsancak Eczanesi",
+        Telefon: "02324641234",
+        Adres: "Ali Çetinkaya Bulvarı No: 18/A",
+        Bolge: "Konak",
+        LokasyonX: "38.4385",
+        LokasyonY: "27.1432",
+        Tarih: "2026-11-20"
+      },
+      {
+        EczaneId: 445,
+        Adi: "Bostanlı Eczanesi",
+        Telefon: "02323624567",
+        Adres: "Cemal Gürsel Cad. No: 92/B",
+        Bolge: "Karşıyaka",
+        LokasyonX: "38.4552",
+        LokasyonY: "27.0981",
+        Tarih: "2026-11-20"
+      }
+    ],
+    tableHeaders: ["Adi", "Bolge", "Telefon", "Adres"],
+    tableRows: [
+      ["Alsancak Eczanesi", "Konak", "02324641234", "Ali Çetinkaya Bulvarı No: 18/A"],
+      ["Bostanlı Eczanesi", "Karşıyaka", "02323624567", "Cemal Gürsel Cad. No: 92/B"]
+    ]
+  },
+
+  izsu: {
+    name: "İZSU Baraj Doluluk",
+    badge: "Altyapı",
+    endpoint: "client.izsu.get_baraj_durum_list()",
+    pyCode: `import asyncio
+from izmir_open_data import IzmirClient
+
+async def main():
+    async with IzmirClient() as client:
+        # İzmir barajlarının anlık doluluk ve su hacim verileri
+        barajlar = await client.izsu.get_baraj_durum_list()
+        tahtali = next((b for b in barajlar if "Tahtalı" in b.get("BarajAdi", "")), None)
+
+        if tahtali:
+            print(f"Tahtalı Barajı Doluluk Oranı: %{tahtali.get('DolulukOrani')}")
+
+asyncio.run(main())`,
+    jsonResult: [
+      {
+        BarajAdi: "Tahtalı Barajı",
+        KapasiteM3: 287000000,
+        MevcutSuHacmiM3: 98500000,
+        DolulukOrani: 34.32,
+        Tarih: "2026-11-20"
+      },
+      {
+        BarajAdi: "Balçova Barajı",
+        KapasiteM3: 7750000,
+        MevcutSuHacmiM3: 3100000,
+        DolulukOrani: 40.0,
+        Tarih: "2026-11-20"
+      },
+      {
+        BarajAdi: "Gördes Barajı",
+        KapasiteM3: 448000000,
+        MevcutSuHacmiM3: 32000000,
+        DolulukOrani: 7.14,
+        Tarih: "2026-11-20"
+      }
+    ],
+    tableHeaders: ["BarajAdi", "KapasiteM3", "DolulukOrani", "Tarih"],
+    tableRows: [
+      ["Tahtalı Barajı", "287,000,000 m³", "%34.32", "2026-11-20"],
+      ["Balçova Barajı", "7,750,000 m³", "%40.00", "2026-11-20"],
+      ["Gördes Barajı", "448,000,000 m³", "%7.14", "2026-11-20"]
+    ]
+  },
+
+  ckanQuery: {
+    name: "CKAN & Veri Bilimi",
+    badge: "Pandas/Polars",
+    endpoint: "client.ckan.query(resource_id)",
+    pyCode: `import asyncio
+from izmir_open_data import IzmirClient, to_dataframe, to_polars
+
+async def main():
+    async with IzmirClient() as client:
+        # Akıllı Tuvaletler Datastore üzerinde akıcı sorgu
+        query = (
+            client.ckan
+            .query("d87de3c1-9bc0-4a8c-842a-90cd2a30d03a")
+            .where("ILCE", "KONAK")
+            .sort("_id", "asc")
+            .page(1, 10)
+        )
+        result = await query.execute()
+
+        # Doğrudan Pandas veya Polars DataFrame'e dönüştürün
+        df = to_dataframe(result.get("records", []))
+        print("Pandas Shape:", df.shape)
+        # pl_df = to_polars(result.get("records", []))
+
+asyncio.run(main())`,
+    jsonResult: {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [27.1287, 38.4189]
+          },
+          properties: {
+            _id: 1,
+            ADI: "Konak Meydanı Akıllı Tuvalet",
+            ILCE: "KONAK",
+            ERISILEBILIR: "EVET",
+            DURUM: "AKTIF"
+          }
+        },
+        {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [27.1428, 38.4356]
+          },
+          properties: {
+            _id: 2,
+            ADI: "Gündoğdu Meydanı Akıllı Tuvalet",
+            ILCE: "KONAK",
+            ERISILEBILIR: "EVET",
+            DURUM: "AKTIF"
+          }
+        }
+      ]
+    },
+    tableHeaders: ["_id", "ADI", "ILCE", "ERISILEBILIR", "DURUM"],
+    tableRows: [
+      ["1", "Konak Meydanı Akıllı Tuvalet", "KONAK", "EVET", "AKTIF"],
+      ["2", "Gündoğdu Meydanı Akıllı Tuvalet", "KONAK", "EVET", "AKTIF"]
+    ]
+  }
+};
+
+// ============================================================================
+// 2. Install Bar Tabs
+// ============================================================================
+const INSTALL_COMMANDS = {
+  pip: "pip install izmir-open-data-py",
+  uv: "uv add izmir-open-data-py",
+  poetry: "poetry add izmir-open-data-py",
+  all: 'pip install "izmir-open-data-py[all]"',
+  cli: "uvx --from izmir-open-data-py izmir-data get nobetcieczaneler"
+};
+
+function initInstallTabs() {
+  const tabs = document.querySelectorAll(".install-tab-btn");
+  const commandText = document.getElementById("install-command");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const pm = tab.getAttribute("data-pm");
+      if (!pm || !INSTALL_COMMANDS[pm]) return;
+
+      tabs.forEach((t) => t.setAttribute("aria-selected", "false"));
+      tab.setAttribute("aria-selected", "true");
+
+      if (commandText) {
+        commandText.textContent = INSTALL_COMMANDS[pm];
+      }
+    });
+  });
+}
+
+// ============================================================================
+// 3. Copy Button Functionality (Async Clipboard API + Live Region Feedback)
+// ============================================================================
+const copyTimers = new WeakMap();
+
+async function handleCopy(button) {
+  const targetId = button.getAttribute("commandfor");
+  let text = "";
+
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) text = el.innerText.trim();
+  } else if (button.getAttribute("data-copy-text")) {
+    text = button.getAttribute("data-copy-text");
+  }
+
+  if (!text) return;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showCopyFeedback(button, true);
+  } catch {
+    showCopyFeedback(button, false);
+  }
+}
+
+function showCopyFeedback(button, success) {
+  const tooltip = button.nextElementSibling;
+  clearTimeout(copyTimers.get(button));
+
+  button.removeAttribute("data-copied");
+  button.removeAttribute("data-failed");
+
+  const message = success ? "Kopyalandı!" : "Kopyalama başarısız";
+  if (tooltip) tooltip.textContent = "";
+
+  void button.offsetWidth; // Force reflow
+  button.setAttribute(success ? "data-copied" : "data-failed", "");
+
+  if (tooltip) {
+    requestAnimationFrame(() => {
+      tooltip.textContent = message;
+    });
+  }
+
+  copyTimers.set(
+    button,
+    setTimeout(() => {
+      button.removeAttribute("data-copied");
+      button.removeAttribute("data-failed");
+      if (tooltip) tooltip.textContent = "";
+    }, 2000)
+  );
+}
+
+function initCopyButtons() {
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".copy-btn");
+    if (btn) {
+      handleCopy(btn);
+    }
+  });
+}
+
+// ============================================================================
+// 4. Accessible Theme Toggle (light-dark() and meta sync)
+// ============================================================================
+function initThemeToggle() {
+  const toggleBtn = document.getElementById("theme-toggle");
+  const meta = document.querySelector('meta[name="color-scheme"]');
+  if (!toggleBtn) return;
+
+  function applyTheme(target) {
+    if (meta) meta.content = target;
+    document.documentElement.setAttribute("data-theme", target);
+    document.documentElement.style.colorScheme = target;
+    try {
+      localStorage.setItem("color-scheme", target);
+    } catch {
+      // Ignore private mode storage failure
+    }
+  }
+
+  // Sync initial state if stored
+  try {
+    const stored = localStorage.getItem("color-scheme");
+    if (stored) {
+      applyTheme(stored);
+    }
+  } catch {}
+
+  toggleBtn.addEventListener("click", () => {
+    const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") ||
+      (meta && (meta.content === "dark" || meta.content === "light") ? meta.content : "") ||
+      (isSystemDark ? "dark" : "light");
+
+    const target = currentTheme === "dark" ? "light" : "dark";
+    applyTheme(target);
+  });
+}
+
+// ============================================================================
+// 5. Interactive Playground Controller
+// ============================================================================
+let currentEndpointKey = "eshot";
+let currentViewMode = "py"; // 'py' | 'json' | 'table'
+
+function renderPlayground() {
+  const data = ENDPOINTS_DATA[currentEndpointKey];
+  const display = document.getElementById("playground-display");
+  if (!data || !display) return;
+
+  if (currentViewMode === "py") {
+    display.innerHTML = `<pre><code>${escapeHtml(data.pyCode)}</code></pre>`;
+  } else if (currentViewMode === "json") {
+    display.innerHTML = `<pre><code>${escapeHtml(JSON.stringify(data.jsonResult, null, 2))}</code></pre>`;
+  } else if (currentViewMode === "table") {
+    if (data.tableHeaders && data.tableRows) {
+      let tableHtml = `<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-subtle); text-align: left;">
+            ${data.tableHeaders.map((h) => `<th style="padding: 0.6rem 0.75rem; color: var(--brand-aegean);">${h}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${data.tableRows
+            .map(
+              (row) => `<tr style="border-bottom: 1px solid var(--border-subtle);">
+            ${row.map((cell) => `<td style="padding: 0.6rem 0.75rem; color: #cbd5e1;">${escapeHtml(cell)}</td>`).join("")}
+          </tr>`
+            )
+            .join("")}
+        </tbody>
+      </table></div>`;
+      display.innerHTML = tableHtml;
+    } else {
+      display.innerHTML = `<pre><code>${escapeHtml(JSON.stringify(data.jsonResult, null, 2))}</code></pre>`;
+    }
+  }
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function initPlayground() {
+  const endpointBtns = document.querySelectorAll(".endpoint-btn");
+  const viewModeBtns = document.querySelectorAll(".view-mode-btn");
+  const executeBtn = document.getElementById("execute-btn");
+
+  endpointBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.getAttribute("data-endpoint");
+      if (!key || !ENDPOINTS_DATA[key]) return;
+
+      endpointBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
+      btn.setAttribute("aria-selected", "true");
+
+      currentEndpointKey = key;
+      renderPlayground();
+    });
+  });
+
+  viewModeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.getAttribute("data-view");
+      if (!mode) return;
+
+      viewModeBtns.forEach((b) => b.setAttribute("aria-selected", "false"));
+      btn.setAttribute("aria-selected", "true");
+
+      currentViewMode = mode;
+      renderPlayground();
+    });
+  });
+
+  if (executeBtn) {
+    executeBtn.addEventListener("click", () => {
+      const originalText = executeBtn.innerHTML;
+      executeBtn.disabled = true;
+      executeBtn.innerHTML = `<span>Sorgulanıyor...</span>`;
+
+      setTimeout(() => {
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = originalText;
+        currentViewMode = "json";
+
+        viewModeBtns.forEach((b) => {
+          b.setAttribute("aria-selected", b.getAttribute("data-view") === "json" ? "true" : "false");
+        });
+
+        renderPlayground();
+      }, 350);
+    });
+  }
+
+  renderPlayground();
+}
+
+// ============================================================================
+// 6. Terminal Interactive Commands Controller
+// ============================================================================
+const TERMINAL_OUTPUTS = {
+  get: `$ izmir-data get nobetcieczaneler
+Fetching dataset: ibb/nobetcieczaneler from İzmir Open Data...
+┌───────────────────┬───────────┬─────────────┬────────────────────────────────┐
+│ Adi               │ Bolge     │ Telefon     │ Adres                          │
+├───────────────────┼───────────┼─────────────┼────────────────────────────────┤
+│ Alsancak Eczanesi │ Konak     │ 02324641234 │ Ali Çetinkaya Bulv. No: 18/A   │
+│ Bostanlı Eczanesi │ Karşıyaka │ 02323624567 │ Cemal Gürsel Cad. No: 92/B     │
+│ Göztepe Eczanesi  │ Konak     │ 02322448910 │ Mithatpaşa Cad. No: 612        │
+└───────────────────┴───────────┴─────────────┴────────────────────────────────┘
+Not: Terminale sığması için 4 sütun gösterildi.`,
+
+  search: `$ izmir-data search otopark
+Searching datasets for: otopark in İzmir Açık Veri...
+Toplam bulunan veri seti: 3 (Gösterilen: 3)
+
+┌────────────────────────┬────────────────────────────────────┬───────────────┐
+│ ID / Slug              │ Başlık                             │ Kaynak Sayısı │
+├────────────────────────┼────────────────────────────────────┼───────────────┤
+│ otopark-ucret-tarifesi │ İZELMAN Otopark Ücret Tarifesi     │ 2             │
+│ izum-otopark-kapasite  │ İZUM Otopark Anlık Doluluk Verileri│ 1             │
+│ engelli-otopark-yerleri│ Engelli Araç Park Yerleri Konumları│ 1             │
+└────────────────────────┴────────────────────────────────────┴───────────────┘`,
+
+  datastore: `$ izmir-data datastore d87de3c1-9bc0-4a8c-842a-90cd2a30d03a -l 2
+Querying CKAN Datastore resource: d87de3c1-9bc0-4a8c-842a-90cd2a30d03a
+Total records: 184 (showing 2)
+
+┌─────┬─────────────────────────────────┬───────┬─────────────┬────────┐
+│ _id │ ADI                             │ ILCE  │ ERISILEBILIR│ DURUM  │
+├─────┼─────────────────────────────────┼───────┼─────────────┼────────┤
+│ 1   │ Konak Meydanı Akıllı Tuvalet    │ KONAK │ EVET        │ AKTIF  │
+│ 2   │ Gündoğdu Meydanı Akıllı Tuvalet │ KONAK │ EVET        │ AKTIF  │
+└─────┴─────────────────────────────────┴───────┴─────────────┴────────┘`
+};
+
+function initTerminalTabs() {
+  const termTabs = document.querySelectorAll(".term-tab-btn");
+  const termOutput = document.getElementById("terminal-output");
+
+  termTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const cmdKey = tab.getAttribute("data-term-cmd");
+      if (!cmdKey || !TERMINAL_OUTPUTS[cmdKey]) return;
+
+      termTabs.forEach((t) => t.setAttribute("aria-selected", "false"));
+      tab.setAttribute("aria-selected", "true");
+
+      if (termOutput) {
+        termOutput.textContent = TERMINAL_OUTPUTS[cmdKey];
+      }
+    });
+  });
+}
+
+// ============================================================================
+// 7. Initialization
+// ============================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  initInstallTabs();
+  initCopyButtons();
+  initThemeToggle();
+  initPlayground();
+  initTerminalTabs();
+});
