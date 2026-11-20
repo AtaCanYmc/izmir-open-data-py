@@ -7,7 +7,9 @@ from izmir_open_data.core.exceptions import APIError
 from izmir_open_data.core.geojson import extract_coordinates, to_geojson
 from izmir_open_data.core.parquet import read_parquet, to_geoparquet, to_parquet
 from izmir_open_data.core.retry import RetryConfig
-from izmir_open_data.core.stream import stream, stream_batches
+from izmir_open_data.core.stream import stream_batches, stream_records
+
+stream = stream_records
 
 __all__ = [
     "APIError",
@@ -20,6 +22,7 @@ __all__ = [
     "read_parquet",
     "stream",
     "stream_batches",
+    "stream_records",
     "to_dataframe",
     "to_geojson",
     "to_geoparquet",
