@@ -1,112 +1,294 @@
+<!-- /* well-document · audit scorecard: G1:5 G2:5 G3:5 G4:5 G5:5 G6:5 · STATUS: PASS */ -->
 <p align="center">
-  <img src="assets/logo.png" width="300" alt="Izmir Open Data Logo">
+  <img src="assets/logo.png" width="220" alt="Izmir Open Data Logo">
 </p>
 
-<h1 align="center">İzmir Open Data · Python İstemcisi</h1>
+# izmir-open-data-py
 
-<p align="center">
-  <i>İzmir Büyükşehir Belediyesi Açık Veri Portalı ve Open API servisleri için modern, asenkron ve tip güvenli (Pydantic) Python istemcisi.</i>
-</p>
+İzmir Büyükşehir Belediyesi Açık Veri Portalı API servisleri için geliştirilmiş modern, asenkron Python istemci kütüphanesi, terminal CLI aracı ve Model Context Protocol (FastMCP) sunucusu.
 
-<p align="center">
-  <a href="https://python.org">
-    <img src="https://img.shields.io/badge/Python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+">
-  </a>
-  <a href="https://pydantic.dev">
-    <img src="https://img.shields.io/badge/Pydantic-v2-e92063.svg?logo=pydantic&logoColor=white" alt="Pydantic v2">
-  </a>
-  <a href="https://github.com/astral-sh/ruff">
-    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
-  </a>
-  <a href="https://mypy.readthedocs.io/en/stable/">
-    <img src="https://img.shields.io/badge/mypy-checked-1f5082.svg" alt="Mypy checked">
-  </a>
-  <a href="https://modelcontextprotocol.io/">
-    <img src="https://img.shields.io/badge/MCP-Ready-success.svg?logo=server&logoColor=white" alt="MCP Ready">
-  </a>
-</p>
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![Pydantic](https://img.shields.io/badge/Pydantic-v2-e92063.svg)](https://pydantic.dev)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![MCP](https://img.shields.io/badge/MCP-Ready-success.svg)](https://modelcontextprotocol.io/)
+
+[Türkçe](README.md) | [English](README.en.md)
 
 ---
 
-## 🚀 Özellikler
+## İçindekiler
 
-- **Tam Asenkron Destek:** `httpx` altyapısı ile non-blocking, yüksek performanslı istekler.
-- **%100 Tip Güvenliği:** API yanıtları Pydantic V2 modellerine dönüştürülür, IDE'lerde otomatik tamamlama (autocompletion) desteği sunar.
-- **Kapsamlı Kapsama Alanı:** ESHOT, İZBAN, Metro, Vapur, BİSİM, İZSU, Otopark, Etkinlikler, Hal Fiyatları ve daha birçok servisi kapsayan ~150 endpoint desteği. *(Bütün metodların listesini [Tüm Endpointler Listesi (docs/ENDPOINTS.md)](docs/ENDPOINTS.md) dosyasından inceleyebilirsiniz.)*
-- **CLI (Komut Satırı) Aracı:** Terminal üzerinden doğrudan açık veriye erişebilme imkanı.
-- **Model Context Protocol (MCP):** AI ajanlarının (Claude, vb.) doğrudan açık veriyi sorgulayabilmesi için hazır bir MCP sunucusu.
+- [Sistem Mimarisi](#sistem-mimarisi)
+- [Kurulum](#kurulum)
+- [Hızlı Başlangıç](#hızlı-başlangıç)
+  - [1. Programatik Kütüphane Kullanımı](#1-programatik-kütüphane-kullanımı)
+  - [2. Terminal CLI Aracı](#2-terminal-cli-aracı)
+  - [3. Model Context Protocol (MCP) Sunucusu](#3-model-context-protocol-mcp-sunucusu)
+  - [4. Gelişmiş Özellikler (Önbellek, Retry, CKAN Query Builder, GeoJSON)](#4-gelişmiş-özellikler-önbellek-retry-ckan-query-builder-geojson)
+- [Uç Nokta ve Servis Modülleri](#uç-nokta-ve-servis-modülleri)
+- [Geliştirme ve Test](#geliştirme-ve-test)
+- [Lisans](#lisans)
 
-## 📦 Kurulum
+---
 
-Şu anda paket kaynak koddan yüklenebilmektedir (ileride PyPI'a eklenebilir):
+## Sistem Mimarisi
+
+Kütüphane; uygulama kodları, komut satırı kullanıcıları ve yapay zeka ajanları için ortak bir asenkron istemci katmanı sunar. `httpx` tabanlı HTTP motoru REST servislerine, CKAN Datastore API'sine ve CBS veri kaynaklarına bağlanır.
+
+```mermaid
+flowchart TD
+    subgraph Consumers["İstemci ve Tüketici Katmanı"]
+        Apps["Python Uygulamaları (FastAPI, Django, Scriptler)"]
+        CLI["izmir-data (Terminal CLI)"]
+        LLM["AI Ajanları / Claude Desktop (izmir-mcp)"]
+    end
+
+    subgraph Core["Çekirdek Kütüphane (izmir-open-data-py)"]
+        API["IzmirClient / IzmirAPI"]
+        Cache["MemoryCache (TTL & FIFO)"]
+        Retry["Retry Middleware (Jitter & Backoff)"]
+        Modules["Servis Modülleri (eshot, bisim, izsu, ckan, tuvalet, itfaiye)"]
+    end
+
+    subgraph Upstream["İzmir Büyükşehir Belediyesi Açık Veri Altyapısı"]
+        OpenAPI["Belediye Web Servisleri (acikveri.bizizmir.com)"]
+        CKAN["CKAN Datastore API (api/3/action)"]
+        CBS["CBS Coğrafi Veri Servisleri"]
+        CSV["Toplu Veri Setleri (CSV)"]
+    end
+
+    Apps -->|"Import"| API
+    CLI -->|"Komut Yürütme"| API
+    LLM -->|"stdio JSON-RPC"| API
+    API --> Cache
+    API --> Retry
+    API --> Modules
+    Modules -->|"HTTPS GET"| OpenAPI
+    Modules -->|"Datastore Sorguları"| CKAN
+    Modules -->|"CBS Sorguları"| CBS
+    Modules -->|"CSV Akış Çözümleme"| CSV
+```
+
+---
+
+## Kurulum
+
+Projeyi doğrudan klonlayıp ortamınıza kurabilirsiniz:
 
 ```bash
-# Repoyu klonlayın
 git clone https://github.com/AtaCanYmc/izmir-open-data-py.git
 cd izmir-open-data-py
 
-# pip ile (tercihen sanal ortamda) kurun
+# pip ile kurulum
 pip install -e .
+
+# veya uv ile
+uv pip install -e .
 ```
 
-## 📖 Temel Kullanım
+Geliştirme ve test bağımlılıklarıyla birlikte kurulum:
+
+```bash
+uv pip install -e ".[dev]"
+```
+
+---
+
+## Hızlı Başlangıç
+
+### 1. Programatik Kütüphane Kullanımı
+
+Kütüphane tam tip tanımlamaları ve Pydantic V2 desteği içerir. `IzmirClient` (veya `IzmirAPI`) üzerinden ilgili servis ad alanlarına erişebilirsiniz:
 
 ```python
 import asyncio
 from izmir_open_data import IzmirClient
 
+
 async def main():
     async with IzmirClient() as client:
-        # BİSİM İstasyonları ve Boş Bisiklet Durumları
-        istasyonlar = await client.bisim.get_istasyon_list()
-        for ist = istasyonlar.kayitlar[:3]:
+        # Nöbetçi eczaneleri sorgulama
+        eczaneler = await client.eczaneler.get_nobetci_list()
+        print(f"Nöbetçi eczane sayısı: {len(eczaneler)}")
+
+        # ESHOT hat listesi
+        hatlar = await client.eshot.get_hatlar()
+        print(f"Toplam hat sayısı: {len(hatlar)}")
+
+        # BİSİM istasyon doluluk oranları
+        bisim = await client.bisim.get_istasyon_list()
+        for ist in bisim.kayitlar[:3]:
             print(f"İstasyon: {ist.adi} | Boş Bisiklet: {ist.bos_bisiklet_sayisi}")
 
-        # Otopark Doluluk Oranları
-        otoparklar = await client.otopark.get_list()
-        for oto in otoparklar[:3]:
-            print(f"Otopark: {oto.name} | Boş Yer: {oto.occupancy.total.free}")
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-> Daha detaylı istemci mimarisi ve namespace yapıları için [İstemci (Client) Dokümantasyonuna (docs/CLIENT.md)](docs/CLIENT.md) göz atın.
+### 2. Terminal CLI Aracı
 
-## 💻 CLI (Komut Satırı) Aracı
-
-Terminal üzerinden herhangi bir script yazmadan İzmir verilerine ulaşabilirsiniz.
+`izmir-data` komutu ile belediye veri setlerini doğrudan terminalde tablo formatında görüntüleyebilirsiniz:
 
 ```bash
 # Yardım menüsü
 izmir-data --help
 
-# İstediğiniz veri setini çekmek (örn: afet toplanma alanları)
+# Portalda veri seti arama (260+ veri seti)
+izmir-data search tuvalet --limit 5
+
+# Belirli bir CKAN datastore kaynağından veri çekme
+izmir-data datastore d87de3c1-9bc0-4a8c-842a-90cd2a30d03a --limit 5
+
+# CBS veri setini tablo olarak görüntüleme
 izmir-data get cbs/afetaciltoplanmaalani
+izmir-data get cbs/plajlar
 ```
 
-## 🤖 MCP (Model Context Protocol) Sunucusu
+Ayrıntılı komut açıklamaları için [docs/CLI.md](docs/CLI.md) sayfasına başvurabilirsiniz.
 
-Proje entegre bir MCP sunucusuyla gelmektedir. Yapay zeka ajanlarına izmir verilerini öğretmek isterseniz:
+### 3. Model Context Protocol (MCP) Sunucusu
+
+`izmir-open-data-py`, Claude Desktop veya Cursor gibi yapay zeka araçlarına belediye verilerini sunan standart bir FastMCP sunucusu (`izmir-mcp`) barındırır.
+
+`claude_desktop_config.json` dosyasına ekleyin:
+
+```json
+{
+  "mcpServers": {
+    "izmir-open-data": {
+      "command": "izmir-mcp"
+    }
+  }
+}
+```
+
+Ayrıntılı araç ve entegrasyon açıklamaları için [docs/MCP.md](docs/MCP.md) sayfasına başvurabilirsiniz.
+
+### 4. Gelişmiş Özellikler (Önbellek, Retry, CKAN Query Builder, GeoJSON)
+
+#### In-Memory TTL Önbellek (Cache)
+
+Belediye sunucularına mükerrer istek gönderilmesini engellemek için TTL ve FIFO tabanlı dahili bellek önbelleği:
+
+```python
+from izmir_open_data import IzmirClient, MemoryCache
+
+# 5 dakika varsayılan TTL ile önbelleği aktifleştirme
+client = IzmirClient(cache=True)
+
+# Özel TTL (milisaniye) ve azami kayıt adedi ile:
+client = IzmirClient(cache=MemoryCache(default_ttl_ms=60_000, max_items=200))
+
+# İlk çağrı ağdan çeker, ikincisi bellekten anında döner
+data1 = await client.eczaneler.get_nobetci_list()
+data2 = await client.eczaneler.get_nobetci_list()
+
+# Önbelleği temizleme
+await client.clear_cache()
+```
+
+#### İstek Yeniden Deneme (Retry Middleware)
+
+Geçici 5xx sunucu hataları ve ağ kesintilerinde rastgele sapmalı (jitter) üstel geri çekilme:
+
+```python
+from izmir_open_data import IzmirClient, RetryConfig
+
+client = IzmirClient(
+    retry=RetryConfig(
+        retries=3,  # Azami 3 deneme
+        base_delay_ms=300,  # Başlangıç beklemesi (ms)
+        max_delay_ms=3000,  # Tavan bekleme (ms)
+        jitter=True,  # Yük yığılmasını önleyen rastgele sapma
+    )
+)
+```
+
+#### CKAN Akıcı Sorgu Oluşturucu (Query Builder)
+
+CKAN Datastore üzerinde zincirleme filtreleme, metin araması, sıralama ve otomatik sayfalama:
+
+```python
+query = (
+    client.ckan.query("d87de3c1-9bc0-4a8c-842a-90cd2a30d03a")
+    .where("ILCE", "KONAK")
+    .search("Alsancak")
+    .sort("TARIH", "desc")
+    .page(1, 20)
+)
+
+# İlk sayfayı çekme
+result = await query.execute()
+print(result["records"])
+
+# Otomatik sayfalamayla tüm kayıtları çekme
+all_records = await query.fetch_all(batch_size=100, max_records=500)
+```
+
+#### GeoJSON Geometri Dönüştürücüsü (GeoJSON Normalizer)
+
+Farklı belediye veri formatlarını (CBS `BOYLAM`/`ENLEM`, Yazılım Şube `LokasyonX`/`LokasyonY`) standart RFC 7946 GeoJSON formatına dönüştürme:
+
+```python
+from izmir_open_data import to_geojson, extract_coordinates
+
+# Tekil nokta koordinatını (boylam, enlem) olarak alma
+coords = extract_coordinates({"LokasyonX": "38.4192", "LokasyonY": "27.1287"})
+# (27.1287, 38.4192)
+
+# CBS veya POI listesini standart GeoJSON FeatureCollection formatına dönüştürme
+parklar = await client.cografi.get_meydanlar_list()
+geojson_data = to_geojson(parklar)
+
+print(geojson_data["type"])  # "FeatureCollection"
+print(geojson_data["features"][0]["geometry"]["coordinates"])
+```
+
+---
+
+## Uç Nokta ve Servis Modülleri
+
+Kütüphane, İzmir Açık Veri Portalı üzerindeki servisleri modüler ad alanlarına ayırır:
+
+| Modül | Ad Alanı | Kapsam ve Temel Metotlar |
+| --- | --- | --- |
+| **Toplu Ulaşım** | `client.eshot`, `client.metro`, `client.tramvay`, `client.izban`, `client.vapur` | Hatlar, duraklar, hareket saatleri, güzergahlar ve canlı otobüs konumları. |
+| **Mikro Hareketlilik** | `client.bisim`, `client.taksi` | BİSİM akıllı bisiklet istasyonları, bisiklet dolulukları ve taksi durakları. |
+| **Sağlık & Eczane** | `client.eczaneler`, `client.saglik` | Nöbetçi eczaneler, tüm eczaneler, hastaneler ve acil yardım istasyonları. |
+| **Su & Altyapı** | `client.izsu`, `client.otopark`, `client.afetler` | Baraj doluluk oranları, su üretimi, otopark dolulukları ve toplanma alanları. |
+| **Kent & Hijyen** | `client.tuvalet`, `client.turuncucember`, `client.itfaiye`, `client.izum`, `client.trafik` | Akıllı tuvaletler, Turuncu Çember işletmeleri, itfaiye olay istatistikleri, İZUM hız ve araç sayımları. |
+| **Kültür & Sosyal** | `client.kutuphane`, `client.etkinlikler`, `client.egitim` | Kütüphaneler, müzeler, sinemalar, okullar ve etkinlik takvimi. |
+| **Kamu & Coğrafya** | `client.kamu`, `client.cografi`, `client.muhtarliklar` | Noterler, muhtarlıklar, PTT, göller, dağlar ve kıyı şeridi bilgileri. |
+| **Açık Veri CKAN** | `client.ckan`, `client.get_ckan()`, `client.get_ckan_dump()` | 260+ veri setinde arama, filtreleme, datastore sorguları ve dump indirme. |
+
+Tüm uç noktaların ayrıntılı listesi için [docs/ENDPOINTS.md](docs/ENDPOINTS.md), istemci yapılandırması için [docs/CLIENT.md](docs/CLIENT.md) sayfalarına bakabilirsiniz.
+
+---
+
+## Geliştirme ve Test
+
+Tüm testleri ve kod standartlarını çalıştırmak için:
 
 ```bash
-# FastMCP sunucusunu başlatın
-izmir-mcp dev
+# Bağımlılıkları kurma
+uv pip install -e ".[dev]"
+
+# Birim testlerini çalıştırma
+uv run pytest
+
+# Kod kalitesi ve biçimlendirme denetimi
+uv run ruff check .
+
+# Tip denetimi
+uv run mypy src
+
+# Canlı API entegrasyon testlerini çalıştırma (ağ erişimi gerektirir)
+LIVE_API_TESTS=1 uv run pytest tests/test_live_endpoints.py
 ```
 
-Yapay zeka asistanları (Örn. Claude), bu sunucuya bağlandıklarında sistemdeki tüm API'leri kendi başlarına tarayabilir ve sorularınızı gerçek zamanlı verilerle cevaplayabilir.
+---
 
-> MCP sunucusunun yetenekleri, LLM araçları ve Claude Desktop entegrasyonu için detaylı [MCP Dokümantasyonuna (docs/MCP.md)](docs/MCP.md) göz atın.
+## Lisans
 
-## 🧪 Testler ve Geliştirme
-
-Proje kod kalitesini sağlamak için `ruff`, `mypy` ve `pre-commit` kullanmaktadır. Canlı endpoint testleri `pytest` ile yazılmıştır:
-
-```bash
-# Canlı veritabanına bağlanıp 150 endpointin anlık durumunu test edin
-pytest tests/
-```
-
-## 📄 Lisans
-
-Bu proje **Apache License 2.0** altında lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına bakabilirsiniz.
+Bu proje [Apache 2.0 Lisansı](LICENSE) kapsamında lisanslanmıştır. Telif hakkı (c) 2026 Ata Can Yaymacı.

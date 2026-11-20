@@ -15,32 +15,28 @@ echo
 echo "-----------------------------------"
 echo
 
-# 2. Afet Acil Toplanma Alanları
-echo "[2] 'cbs/afetaciltoplanmaalani' veriseti çekiliyor:"
+# 2. Portalda veri seti arama
+echo "[2] 'tuvalet' anahtar kelimesiyle veri seti arama:"
+izmir-data search tuvalet --limit 5
+echo
+echo "-----------------------------------"
+echo
+
+# 3. CKAN Datastore sorgulama
+echo "[3] Akıllı tuvaletler datastore kaynağından kayıt çekme:"
+izmir-data datastore d87de3c1-9bc0-4a8c-842a-90cd2a30d03a --limit 3
+echo
+echo "-----------------------------------"
+echo
+
+# 4. Afet Acil Toplanma Alanları
+echo "[4] 'cbs/afetaciltoplanmaalani' veriseti çekiliyor:"
 izmir-data get cbs/afetaciltoplanmaalani | head -n 20
 echo "..."
 echo
 
-# 3. İzmir'deki Plajlar
-echo "[3] 'cbs/plajlar' veriseti çekiliyor:"
-izmir-data get cbs/plajlar | head -n 20
-echo "..."
-echo
-
-# 4. Hastaneler
-echo "[4] 'cbs/hastaneler' veriseti çekiliyor:"
+# 5. Hastaneler
+echo "[5] 'cbs/hastaneler' veriseti çekiliyor:"
 izmir-data get cbs/hastaneler | head -n 20
-echo "..."
-echo
-
-# 5. Kütüphaneler
-echo "[5] 'cbs/kutuphaneler' veriseti çekiliyor:"
-izmir-data get cbs/kutuphaneler | head -n 20
-echo "..."
-echo
-
-# 6. Bankalar
-echo "[6] 'cbs/bankalar' veriseti çekiliyor:"
-izmir-data get cbs/bankalar | head -n 20
 echo "..."
 echo

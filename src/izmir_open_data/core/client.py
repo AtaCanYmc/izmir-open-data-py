@@ -1,12 +1,17 @@
 import csv
 import io
+import re
+import urllib.parse
 from typing import Any
 
 import httpx
 
+from izmir_open_data.core.cache import CacheProvider, MemoryCache
 from izmir_open_data.core.exceptions import APIError
+from izmir_open_data.core.retry import RetryConfig, execute_with_retry
 from izmir_open_data.endpoints.afetler import AfetlerEndpoint
 from izmir_open_data.endpoints.bisim import BisimEndpoint
+from izmir_open_data.endpoints.ckan import CKANEndpoint
 from izmir_open_data.endpoints.cografi import CografiEndpoint
 from izmir_open_data.endpoints.eczaneler import EczanelerEndpoint
 from izmir_open_data.endpoints.egitim import EgitimEndpoint
@@ -14,10 +19,12 @@ from izmir_open_data.endpoints.eshot import EshotEndpoint
 from izmir_open_data.endpoints.etkinlikler import EtkinliklerEndpoint
 from izmir_open_data.endpoints.hizmet import HizmetEndpoint
 from izmir_open_data.endpoints.iklim import IklimEndpoint
+from izmir_open_data.endpoints.itfaiye import ItfaiyeEndpoint
 from izmir_open_data.endpoints.izban import IzbanEndpoint
 from izmir_open_data.endpoints.izmirimkart import IzmirimKartEndpoint
 from izmir_open_data.endpoints.izsu import IzsuEndpoint
 from izmir_open_data.endpoints.iztek import IztekEndpoint
+from izmir_open_data.endpoints.izum import IzumEndpoint
 from izmir_open_data.endpoints.kamu import KamuEndpoint
 from izmir_open_data.endpoints.kutuphane import KutuphaneEndpoint
 from izmir_open_data.endpoints.metro import MetroEndpoint
@@ -33,6 +40,8 @@ from izmir_open_data.endpoints.tarihi import TarihiEndpoint
 from izmir_open_data.endpoints.trafik import TrafikEndpoint
 from izmir_open_data.endpoints.tramvay import TramvayEndpoint
 from izmir_open_data.endpoints.tren import TrenEndpoint
+from izmir_open_data.endpoints.turuncucember import TuruncuCemberEndpoint
+from izmir_open_data.endpoints.tuvalet import TuvaletEndpoint
 from izmir_open_data.endpoints.vapur import VapurEndpoint
 from izmir_open_data.endpoints.wizmirnet import WizmirnetEndpoint
 
@@ -46,23 +55,41 @@ class IzmirClient:
         base_url: str = "https://openapi.izmir.bel.tr/api/",
         ckan_base_url: str = "https://acikveri.bizizmir.com/api/3/action/",
         ckan_dump_base_url: str = "https://acikveri.bizizmir.com/datastore/dump/",
+        cache: bool | CacheProvider | None = None,
+        retry: bool | RetryConfig | None = None,
+        timeout: float = 30.0,
     ):
         self.api_key = api_key
         self.base_url = base_url
         self.ckan_base_url = ckan_base_url
         self.ckan_dump_base_url = ckan_dump_base_url
+        self.retry_config = retry
 
-        headers = {"User-Agent": "izmir-open-data-py/0.1.0"}
+        if cache is True:
+            self._cache: CacheProvider | None = MemoryCache()
+        elif cache:
+            self._cache = cache
+        else:
+            self._cache = None
+
+        headers = {"User-Agent": "izmir-open-data-py/0.2.0"}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
 
-        # We don't set base_url here because we request from multiple different base URLs
-        self._client = httpx.AsyncClient(headers=headers, timeout=30.0)
-
-        # Endpoints will be attached dynamically or initialized later
+        self._client = httpx.AsyncClient(headers=headers, timeout=timeout)
         self._init_endpoints()
 
-    def _init_endpoints(self):
+    @property
+    def cache(self) -> CacheProvider | None:
+        """Active cache provider."""
+        return self._cache
+
+    async def clear_cache(self) -> None:
+        """Clear all entries in the cache."""
+        if self._cache:
+            await self._cache.clear()
+
+    def _init_endpoints(self) -> None:
         """Initialize all endpoint namespaces."""
         self.afetler = AfetlerEndpoint(self)
         self.bisim = BisimEndpoint(self)
@@ -95,25 +122,54 @@ class IzmirClient:
         self.vapur = VapurEndpoint(self)
         self.wizmirnet = WizmirnetEndpoint(self)
 
+        # New CKAN and portal modules
+        self.ckan = CKANEndpoint(self)
+        self.itfaiye = ItfaiyeEndpoint(self)
+        self.izum = IzumEndpoint(self)
+        self.turuncucember = TuruncuCemberEndpoint(self)
+        self.tuvalet = TuvaletEndpoint(self)
+
     async def get(self, path: str, response_model: Any = None) -> Any:
-        """Standard API fetch."""
-        url = f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
-        response = await self._client.get(url)
-        if not response.is_success:
-            raise APIError(
-                f"API response error: {response.status_code}", response.status_code
-            )
+        """Standard API fetch with cache, retry, and path traversal protection."""
+        normalized_path = path.lstrip("/")
+        if ".." in normalized_path or re.match(
+            r"^[a-zA-Z][a-zA-Z0-9+.-]*:", normalized_path
+        ):
+            raise ValueError(f"Geçersiz veya güvensiz istek yolu: {path}")
 
-        # Eğer 204 No Content dönerse, JSON parse etmeye çalışmadan None döndür.
-        if response.status_code == 204:
-            return None
+        url = f"{self.base_url.rstrip('/')}/{normalized_path}"
+        cache_key = f"GET:{url}"
 
-        data = response.json()
-        if response_model:
-            from pydantic import TypeAdapter
+        if self._cache:
+            cached = await self._cache.get(cache_key)
+            if cached is not None:
+                return cached
 
-            return TypeAdapter(response_model).validate_python(data)
-        return data
+        async def _fetch():
+            response = await self._client.get(url)
+            if not response.is_success:
+                raise APIError(
+                    f"API response error: {response.status_code}", response.status_code
+                )
+            if response.status_code == 204:
+                return None
+            data = response.json()
+            if response_model:
+                from pydantic import TypeAdapter
+
+                return TypeAdapter(response_model).validate_python(data)
+            return data
+
+        result = (
+            await execute_with_retry(_fetch, self.retry_config)
+            if self.retry_config
+            else await _fetch()
+        )
+
+        if self._cache and result is not None:
+            await self._cache.set(cache_key, result)
+
+        return result
 
     async def get_ckan(
         self,
@@ -121,88 +177,177 @@ class IzmirClient:
         params: dict[str, Any] | None = None,
         response_model: Any = None,
     ) -> Any:
-        """Fetch from CKAN API."""
-        url = f"{self.ckan_base_url.rstrip('/')}/{action.lstrip('/')}"
-        response = await self._client.get(url, params=params or {})
-        if not response.is_success:
-            raise APIError(
-                f"CKAN API response error: {response.status_code}", response.status_code
-            )
+        """Fetch from CKAN API with cache, retry, and safety protections."""
+        clean_action = action.lstrip("/")
+        if ".." in clean_action or re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", clean_action):
+            raise ValueError(f"Geçersiz veya güvensiz CKAN aksiyonu: {action}")
 
-        data = response.json()
-        if data.get("success"):
-            result = data.get("result")
+        url = f"{self.ckan_base_url.rstrip('/')}/{clean_action}"
+        query_params = params or {}
+
+        # Prepare cache key including sorted query params
+        encoded_qs = urllib.parse.urlencode(
+            sorted(
+                [
+                    (
+                        k,
+                        v
+                        if not isinstance(v, (dict, list))
+                        else httpx.Response(200, json=v).text,
+                    )
+                    for k, v in query_params.items()
+                ]
+            )
+        )
+        cache_key = f"CKAN:{url}?{encoded_qs}" if encoded_qs else f"CKAN:{url}"
+
+        if self._cache:
+            cached = await self._cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+        async def _fetch():
+            # For complex objects in params, convert to string
+            formatted_params = {}
+            for k, v in query_params.items():
+                if v is not None:
+                    if isinstance(v, (dict, list)):
+                        import json
+
+                        formatted_params[k] = json.dumps(v)
+                    else:
+                        formatted_params[k] = v
+
+            response = await self._client.get(url, params=formatted_params)
+            if not response.is_success:
+                raise APIError(
+                    f"CKAN API response error: {response.status_code}",
+                    response.status_code,
+                )
+
+            data = response.json()
+            if data.get("success"):
+                res = data.get("result")
+                if response_model:
+                    from pydantic import TypeAdapter
+
+                    return TypeAdapter(response_model).validate_python(res)
+                return res
+            else:
+                error_msg = data.get("error", {}).get("message", "Unknown CKAN error")
+                raise APIError(f"CKAN Error: {error_msg}")
+
+        result = (
+            await execute_with_retry(_fetch, self.retry_config)
+            if self.retry_config
+            else await _fetch()
+        )
+
+        if self._cache and result is not None:
+            await self._cache.set(cache_key, result)
+
+        return result
+
+    async def get_ckan_dump(self, resource_id: str, response_model: Any = None) -> Any:
+        """Fetch from CKAN Dump API with URL encoding."""
+        clean_id = urllib.parse.quote(resource_id.strip(), safe="")
+        url = f"{self.ckan_dump_base_url.rstrip('/')}/{clean_id}?format=json"
+        cache_key = f"DUMP:{url}"
+
+        if self._cache:
+            cached = await self._cache.get(cache_key)
+            if cached is not None:
+                return cached
+
+        async def _fetch():
+            response = await self._client.get(url, timeout=30.0)
+            if not response.is_success:
+                raise APIError(
+                    f"CKAN Dump API response error: {response.status_code}",
+                    response.status_code,
+                )
+
+            data = response.json()
             if response_model:
                 from pydantic import TypeAdapter
 
-                return TypeAdapter(response_model).validate_python(result)
-            return result
-        else:
-            error_msg = data.get("error", {}).get("message", "Unknown CKAN error")
-            raise APIError(f"CKAN Error: {error_msg}")
+                return TypeAdapter(response_model).validate_python(data)
+            return data
 
-    async def get_ckan_dump(self, resource_id: str, response_model: Any = None) -> Any:
-        """Fetch from CKAN Dump API."""
-        url = f"{self.ckan_dump_base_url.rstrip('/')}/{resource_id.lstrip('/')}?format=json"
-        response = await self._client.get(url, timeout=30.0)
-        if not response.is_success:
-            raise APIError(
-                f"CKAN Dump API response error: {response.status_code}",
-                response.status_code,
-            )
+        result = (
+            await execute_with_retry(_fetch, self.retry_config)
+            if self.retry_config
+            else await _fetch()
+        )
 
-        data = response.json()
-        if response_model:
-            from pydantic import TypeAdapter
+        if self._cache and result is not None:
+            await self._cache.set(cache_key, result)
 
-            return TypeAdapter(response_model).validate_python(data)
-        return data
+        return result
 
     async def get_csv(self, url: str, delimiter: str = ";") -> list[dict[str, Any]]:
-        """Fetch and parse CSV data."""
-        response = await self._client.get(url, timeout=30.0)
-        if not response.is_success:
-            raise APIError(
-                f"CSV API response error: {response.status_code}", response.status_code
-            )
+        """Fetch and parse CSV data with prototype/pollution protection."""
+        cache_key = f"CSV:{url}"
 
-        text = response.text
-        # Use csv module to parse
-        f = io.StringIO(text.strip())
-        reader = csv.DictReader(f, delimiter=delimiter)
+        if self._cache:
+            cached = await self._cache.get(cache_key)
+            if cached is not None:
+                return cached
 
-        results = []
-        if reader.fieldnames:
-            # Clean field names by stripping whitespace and quotes
-            cleaned_fieldnames = [f.strip().strip('"') for f in reader.fieldnames]
-            reader.fieldnames = cleaned_fieldnames
+        async def _fetch():
+            response = await self._client.get(url, timeout=30.0)
+            if not response.is_success:
+                raise APIError(
+                    f"CSV API response error: {response.status_code}",
+                    response.status_code,
+                )
 
-            for row in reader:
-                cleaned_row = {}
-                for k, v in row.items():
-                    if k is None:
-                        continue
-                    val = v.strip().strip('"') if v else ""
-                    # Convert to number if possible, but keep string if it contains special chars like : or -
-                    if (
-                        val == ""
-                        or ":" in val
-                        or "-" in val
-                        or val.lower() in ("true", "false")
-                    ):
-                        cleaned_row[k] = val
-                    else:
-                        try:
-                            # Try integer first
-                            if "." in val:
-                                cleaned_row[k] = float(val)
-                            else:
-                                cleaned_row[k] = int(val)
-                        except ValueError:
+            text = response.text
+            f = io.StringIO(text.strip())
+            reader = csv.DictReader(f, delimiter=delimiter)
+
+            results = []
+            disallowed_fields = {"__proto__", "constructor", "prototype"}
+
+            if reader.fieldnames:
+                cleaned_fieldnames = [f.strip().strip('"') for f in reader.fieldnames]
+                reader.fieldnames = cleaned_fieldnames
+
+                for row in reader:
+                    cleaned_row = {}
+                    for k, v in row.items():
+                        if k is None or k in disallowed_fields:
+                            continue
+                        val = v.strip().strip('"') if v else ""
+                        if (
+                            val == ""
+                            or ":" in val
+                            or "-" in val
+                            or val.lower() in ("true", "false")
+                        ):
                             cleaned_row[k] = val
-                results.append(cleaned_row)
+                        else:
+                            try:
+                                if "." in val:
+                                    cleaned_row[k] = float(val)
+                                else:
+                                    cleaned_row[k] = int(val)
+                            except ValueError:
+                                cleaned_row[k] = val
+                    results.append(cleaned_row)
 
-        return results
+            return results
+
+        result = (
+            await execute_with_retry(_fetch, self.retry_config)
+            if self.retry_config
+            else await _fetch()
+        )
+
+        if self._cache and result is not None:
+            await self._cache.set(cache_key, result)
+
+        return result
 
     async def close(self) -> None:
         """Close the underlying HTTP client."""

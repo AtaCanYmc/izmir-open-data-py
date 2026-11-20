@@ -1,6 +1,6 @@
 [project]
 name = "izmir-open-data-py"
-version = "0.1.0"
+version = "0.2.0"
 description = "Izmir Open Data API Client and MCP Server"
 readme = "README.md"
 authors = [
@@ -21,6 +21,7 @@ dependencies = [
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "respx>=0.21.0",
     "pre-commit>=3.7.0",
     "ruff>=0.4.8",
     "mypy>=1.10.0"
@@ -45,7 +46,6 @@ namespaces = false
 line-length = 88
 target-version = "py311"
 
-
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 ignore = ["E501"]
@@ -56,3 +56,8 @@ known-first-party = ["izmir_open_data"]
 [tool.mypy]
 ignore_missing_imports = true
 disable_error_code = ["no-any-return", "return-value", "no-untyped-def", "no-untyped-call", "operator", "index", "attr-defined", "misc", "type-arg"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

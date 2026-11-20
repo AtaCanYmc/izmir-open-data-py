@@ -9,21 +9,36 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
+
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-    - name: Install dependencies
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv and dependencies
       run: |
         python -m pip install --upgrade pip
         pip install uv
         uv pip install --system -e ".[dev]"
-    - name: Run Ruff (Linting & Formatting)
+
+    - name: Run Ruff Lint Check
       run: |
         ruff check .
-        ruff format --check .
-    - name: Run Mypy (Type Checking)
+
+    - name: Run Ruff Format Check
       run: |
-        mypy src/
+        ruff format --check .
+
+    - name: Run Mypy Type Checking
+      run: |
+        mypy src
+
+    - name: Run Unit Tests
+      run: |
+        pytest tests/

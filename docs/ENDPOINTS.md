@@ -259,3 +259,51 @@
 | Metod Adı | Açıklama |
 |---|---|
 | `get_list()` | Ücretsiz-kablosuz internet hizmet noktaları ve lokasyon bilgilerini içeren web servisi. |
+
+## CKAN (`client.ckan`)
+| Metod Adı | Açıklama |
+|---|---|
+| `search_packages(query, ...)` | İzmir Açık Veri Portalı üzerindeki tüm veri setlerinde metin, etiket ve format araması yapar. |
+| `get_package(id_or_name)` | Belirli bir veri setinin tüm kaynaklarını ve meta verilerini getirir. |
+| `list_packages(limit, offset)` | Portaldaki tüm veri seti slug isimlerini listeler. |
+| `query(resource_id)` | CKAN datastore üzerinde akıcı (fluent) sorgu oluşturucu başlatır. |
+| `search_datastore(resource_id, ...)` | Belirli bir datastore kaynağında filtreleme, arama ve sayfalama yapar. |
+| `dump_datastore(resource_id)` | Bir datastore kaynağının tüm verilerini tek seferde JSON formatında indirir. |
+| `list_organizations()` | Portaldaki yayıncı kurum ve daire başkanlıklarını listeler. |
+| `list_groups()` | Portaldaki kategori gruplarını listeler. |
+| `list_tags(query)` | Portaldaki tüm etiketleri listeler. |
+
+## İtfaiye (`client.itfaiye`)
+| Metod Adı | Açıklama |
+|---|---|
+| `get_gruplar()` | İtfaiye istasyonları ve gruplarının konum bilgilerini listeler (CBS). |
+| `get_acil_mudahale_istatistigi(...)` | Yangın ve kurtarma acil müdahale sayılarını sorgular (CKAN). |
+| `get_egitim_hizmetleri(...)` | İtfaiye eğitim hizmetleri istatistiklerini sorgular (CKAN). |
+| `dump_acil_mudahale()` | Acil müdahale istatistiklerini toplu JSON olarak indirir. |
+| `dump_egitim_hizmetleri()` | Eğitim hizmetleri istatistiklerini toplu JSON olarak indirir. |
+
+## İZUM (`client.izum`)
+| Metod Adı | Açıklama |
+|---|---|
+| `get_ana_arter_hiz_ve_sure(...)` | Ana arterler günlük hız ve seyahat süresi verilerini sorgular (CKAN). |
+| `get_vms_panolari(...)` | Işıklı Şehir Yönlendirme Panoları (VMS) konum ve boyut bilgilerini sorgular (CKAN). |
+| `get_arac_sayim_verileri(...)` | Ana arterler araç sayım verilerini sorgular (CKAN). |
+| `get_otoparklar()` | Canlı otopark doluluk ve konum verilerini getirir. |
+| `get_kameralar()` | Trafik izleme kameralarını getirir (CSV). |
+| `dump_ana_arter_hiz_ve_sure()` | Ana arter hız ve süre verilerini toplu JSON olarak indirir. |
+| `dump_arac_sayim_verileri()` | Araç sayım verilerini toplu JSON olarak indirir. |
+
+## Turuncu Çember (`client.turuncucember`)
+| Metod Adı | Açıklama |
+|---|---|
+| `get_isletmeler()` | Turuncu Çember sertifikalı işletmeler listesini döndürür. |
+| `get_isletme(id)` | Belirli bir işletmenin sertifika detaylarını getirir. |
+| `get_sayilar()` | Turuncu Çember başvuru ve istatistik sayılarını getirir. |
+
+## Tuvalet (`client.tuvalet`)
+| Metod Adı | Açıklama |
+|---|---|
+| `get_akilli_tuvaletler(...)` | Akıllı tuvaletlerin konum ve adres bilgilerini sorgular (CKAN). |
+| `get_moduler_tuvaletler(...)` | Modüler tuvalet ve bebek bakım alanlarının donanım ve erişilebilirlik verilerini sorgular (CKAN). |
+| `dump_akilli_tuvaletler()` | Akıllı tuvalet verilerini toplu JSON olarak indirir. |
+| `dump_moduler_tuvaletler()` | Modüler tuvalet verilerini toplu JSON olarak indirir. |

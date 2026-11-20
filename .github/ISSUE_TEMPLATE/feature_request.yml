@@ -1,0 +1,23 @@
+name: Yeni Özellik Önerisi (Feature Request)
+description: Yeni bir belediye veri seti veya istemci yeteneği önerin.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: İhtiyaç veya Problem Tanımı
+      description: Mevcut durumda eksik olan veya iyileştirilmesi gereken konuyu açıklayın.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Önerilen Çözüm veya API Tasarımı
+      description: Bu özelliğin istemci veya CLI arayüzünde nasıl kullanılacağını örneklendirin.
+    validations:
+      required: true
+  - type: input
+    id: dataset_url
+    attributes:
+      label: İlgili Açık Veri Portalı Bağlantısı (Opsiyonel)
+      description: Eğer yeni bir veri seti ise acikveri.bizizmir.com bağlantısını ekleyin.

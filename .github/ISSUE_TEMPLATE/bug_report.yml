@@ -1,0 +1,39 @@
+name: Hata Bildirimi (Bug Report)
+description: Kütüphane, CLI veya MCP sunucusunda karşılaştığınız bir hatayı bildirin.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hata bildiriminde bulunmadan önce lütfen mevcut açık konuları ve dokümantasyonu kontrol edin.
+  - type: textarea
+    id: description
+    attributes:
+      label: Hata Açıklaması
+      description: Karşılaştığınız beklenmeyen davranışı net bir şekilde açıklayın.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Yeniden Üretim Adımları
+      description: Hatayı yeniden üretmek için çalıştırılan kod veya komutları belirtin.
+      placeholder: |
+        1. `client.tuvalet.get_akilli_tuvaletler(...)` çağrısı yapıldı.
+        2. Dönen yanıt formatı incelendi.
+    validations:
+      required: true
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Hata Çıktısı (Stack Trace)
+      description: Varsa konsol loglarını ve traceback çıktısını yapıştırın.
+      render: shell
+  - type: input
+    id: environment
+    attributes:
+      label: Ortam Bilgisi
+      description: Python sürümü, işletim sistemi ve paket sürümü.
+      placeholder: Python 3.11, macOS / Linux, izmir-open-data-py 0.2.0
+    validations:
+      required: true
