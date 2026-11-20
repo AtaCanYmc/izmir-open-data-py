@@ -11,7 +11,8 @@
       "prerelease": false,
       "extra-files": [
         "src/izmir_open_data/__init__.py",
-        "src/izmir_open_data/core/client.py"
+        "src/izmir_open_data/core/client.py",
+        "site/index.html"
       ]
     }
   }

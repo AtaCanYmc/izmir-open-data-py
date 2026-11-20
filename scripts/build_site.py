@@ -99,6 +99,57 @@ def resolve_category(key: str) -> dict[str, str]:
     return {"cat": "dijital", "icon": "dijital.svg", "label": "Genel Veri"}
 
 
+def get_package_version() -> str:
+    """Retrieve package version from pyproject.toml or __init__.py."""
+    pyproject_path = ROOT_DIR / "pyproject.toml"
+    if pyproject_path.exists():
+        match = re.search(
+            r'version\s*=\s*["\']([^"\']+)["\']',
+            pyproject_path.read_text(encoding="utf-8"),
+        )
+        if match:
+            return match.group(1)
+    init_path = ROOT_DIR / "src" / "izmir_open_data" / "__init__.py"
+    if init_path.exists():
+        match = re.search(
+            r'__version__\s*=\s*["\']([^"\']+)["\']',
+            init_path.read_text(encoding="utf-8"),
+        )
+        if match:
+            return match.group(1)
+    return "0.3.0"
+
+
+def sync_index_html_version(version: str) -> None:
+    """Sync version references in site/index.html with current package version."""
+    index_file = SITE_DIR / "index.html"
+    if not index_file.exists():
+        return
+    content = index_file.read_text(encoding="utf-8")
+
+    # 1. Update JSON-LD softwareVersion
+    content = re.sub(
+        r'"softwareVersion":\s*"[^"]+"',
+        f'"softwareVersion": "{version}"',
+        content,
+    )
+    # 2. Update version pill in header
+    content = re.sub(
+        r'<span class="version-pill">v[^<]+</span>',
+        f'<span class="version-pill">v{version}</span>',
+        content,
+    )
+    # 3. Update hero badge text
+    content = re.sub(
+        r"<span>v[0-9.]+\s*Yayında",
+        f"<span>v{version} Yayında",
+        content,
+    )
+
+    index_file.write_text(content, encoding="utf-8")
+    print(f"Synced site/index.html version to v{version}")
+
+
 def get_common_head(
     title: str,
     description: str,
@@ -154,6 +205,8 @@ def get_common_head(
         )
 
     json_ld_str = json.dumps(json_ld, indent=2, ensure_ascii=False)
+
+    version = get_package_version()
 
     return f"""<!DOCTYPE html>
 <html lang="tr">
@@ -213,7 +266,7 @@ def get_common_head(
       <a href="{relative_root}index.html" class="brand-link" aria-label="İzmir Open Data Python Ana Sayfa">
         <img src="{relative_root}assets/logo.svg" alt="Logo" class="brand-logo" width="32" height="32">
         <span>izmir-open-data-py</span>
-        <span class="version-pill">v0.3.0</span>
+        <span class="version-pill">v{version}</span>
       </a>
 
       <nav class="nav-menu" aria-label="Ana Gezinti">
@@ -1115,6 +1168,8 @@ def build_specs_html() -> None:
 
 
 def main() -> None:
+    version = get_package_version()
+    sync_index_html_version(version)
     build_endpoints_html()
     build_cli_html()
     build_mcp_html()

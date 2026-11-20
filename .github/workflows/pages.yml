@@ -9,6 +9,9 @@ on:
       - 'scripts/build_site.py'
       - 'docs/**'
       - '.github/workflows/pages.yml'
+      - 'pyproject.toml'
+      - 'src/izmir_open_data/__init__.py'
+      - '.release-please-manifest.json'
   workflow_dispatch:
 
 permissions:
